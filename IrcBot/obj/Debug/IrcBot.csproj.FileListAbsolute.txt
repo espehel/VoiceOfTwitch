@@ -1,0 +1,6 @@
+E:\Git\VoiceOfTwitch\IrcBot\bin\Debug\IrcBot.exe.config
+E:\Git\VoiceOfTwitch\IrcBot\bin\Debug\IrcBot.exe
+E:\Git\VoiceOfTwitch\IrcBot\bin\Debug\IrcBot.pdb
+E:\Git\VoiceOfTwitch\IrcBot\obj\Debug\IrcBot.csprojResolveAssemblyReference.cache
+E:\Git\VoiceOfTwitch\IrcBot\obj\Debug\IrcBot.exe
+E:\Git\VoiceOfTwitch\IrcBot\obj\Debug\IrcBot.pdb
