@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.IO;
+using IrcBot.Models;
 
 namespace IrcBot
 {
@@ -28,13 +29,15 @@ namespace IrcBot
     private StreamReader reader;
     private StreamWriter writer;
     private Thread ircThread;
+    private List<IMessageListener> listeners;
   
         public Bot(string server, int port, string channel)
         {
             this.Server = server;
             this.Port = port;
             this.Channel = channel;
-         
+            listeners = new List<IMessageListener>(); 
+      
         }
         public void Start()
         {
@@ -69,7 +72,16 @@ namespace IrcBot
                 {
                     while ((inputLine = reader.ReadLine()) != null)
                     {
-                        Console.WriteLine(inputLine);
+                        Console.WriteLine("BOT: " + inputLine);
+                        string[] splitted = inputLine.Split(new char[] { ':' });
+
+//                        for (int i = 0; i < splitted.Length; i++)
+//                        {
+//                            Console.WriteLine("i = " + i + ": " + splitted[i]);
+//                        }
+//                        Statement statement = new Statement(0, splitted[splitted.Length - 1], DateTime.Now);
+                        fireNewMessageEvent(splitted[splitted.Length - 1]);
+
                     }
                 }
                 catch (Exception ex)
@@ -79,6 +91,19 @@ namespace IrcBot
                     Stop();
                     Start();
                 }
+            }
+        }
+
+        public void addListener(IMessageListener listener)
+        {
+            listeners.Add(listener);
+        }
+
+        private void fireNewMessageEvent(string message)
+        {
+            foreach (var messageListener in listeners)
+            {
+                messageListener.NewMessage(message);
             }
         }
         /*
