@@ -8,11 +8,12 @@ namespace IrcBot.Models
 {
     class Statement : IComparable<String>
     {
-        private int Id { get; set; }
-        string Text { get; set; }
-        public int Score { get; set; }
-        DateTime CreatedAt { get; set; }
-        DateTime LastUpdated { get; set; }
+        public int Id { get; set; }
+        public string Text { get; set; }
+        public string[] Terms { get; private set; }
+        public double Score { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime LastUpdated { get; set; }
 
         public Statement(int id, string text, DateTime createdAt)
         {
@@ -21,6 +22,13 @@ namespace IrcBot.Models
             this.CreatedAt = createdAt;
             this.LastUpdated = createdAt;
             this.Score = 1;
+            GenerateTerms();
+        }
+
+        private void GenerateTerms()
+        {
+            //TODO: use the text to make terms for finding similar texts
+            Terms = Text.Split(new char[] {' '});
         }
 
         public int CompareTo(string other)
@@ -44,6 +52,12 @@ namespace IrcBot.Models
                 return Text.Equals(((Statement) obj).Text);
             return false;
 
+        }
+
+        public bool SimilarTo(string message)
+        {
+            // TODO: make a algorithm to check similarity
+            return false;
         }
     }
 }
