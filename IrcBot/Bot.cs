@@ -73,15 +73,18 @@ namespace IrcBot
                     while ((inputLine = reader.ReadLine()) != null)
                     {
                         Console.WriteLine("BOT: " + inputLine);
-                        string[] splitted = inputLine.Split(new char[] { ':' });
+//                        string[] splitted = inputLine.Split(new char[] { ':' });
 
 //                        for (int i = 0; i < splitted.Length; i++)
 //                        {
 //                            Console.WriteLine("i = " + i + ": " + splitted[i]);
 //                        }
 //                        Statement statement = new Statement(0, splitted[splitted.Length - 1], DateTime.Now);
-                        fireNewMessageEvent(splitted[splitted.Length - 1]);
-
+//                        fireNewMessageEvent(splitted[splitted.Length - 1]);
+                        
+                        string trail = extractTrail(inputLine);
+                        if(trail != null)
+                            fireNewMessageEvent(trail);
                     }
                 }
                 catch (Exception ex)
@@ -105,6 +108,77 @@ namespace IrcBot
             {
                 messageListener.NewMessage(message);
             }
+        }
+
+        public string extractTrail(string message)
+        {
+            // http://calebdelnay.com/blog/2010/11/parsing-the-irc-message-format-as-a-client
+
+            int prefixEnd = message.IndexOf(" ");
+
+            string trailing = null;
+            int trailingStart = message.IndexOf(" :");
+            if (trailingStart >= 0)
+                trailing = message.Substring(trailingStart + 2);
+            else
+                trailingStart = message.Length;
+
+            string[] commandAndParameters = message.Substring(prefixEnd + 1, trailingStart - prefixEnd - 1).Split(' ');
+
+            string command = commandAndParameters[0];
+
+            if (command.Equals("PRIVMSG"))
+                return trailing;
+            else
+            {
+                return null;
+            }
+
+
+        }
+
+        public void ParseIrcMessage(string message, out string prefix, out string command, out string[] parameters)
+        {
+            // http://calebdelnay.com/blog/2010/11/parsing-the-irc-message-format-as-a-client
+            int prefixEnd = -1, trailingStart = message.Length;
+            string trailing = null;
+            prefix = command = String.Empty;
+            parameters = new string[] { };
+
+            // Grab the prefix if it is present. If a message begins
+            // with a colon, the characters following the colon until
+            // the first space are the prefix.
+            if (message.StartsWith(":"))
+            {
+                prefixEnd = message.IndexOf(" ");
+                prefix = message.Substring(1, prefixEnd - 1);
+            }
+
+            // Grab the trailing if it is present. If a message contains
+            // a space immediately following a colon, all characters after
+            // the colon are the trailing part.
+            trailingStart = message.IndexOf(" :");
+            if (trailingStart >= 0)
+                trailing = message.Substring(trailingStart + 2);
+            else
+                trailingStart = message.Length;
+
+            // Use the prefix end position and trailing part start
+            // position to extract the command and parameters.
+            var commandAndParameters = message.Substring(prefixEnd + 1, trailingStart - prefixEnd - 1).Split(' ');
+
+            // The command will always be the first element of the array.
+            command = commandAndParameters.First();
+
+            // The rest of the elements are the parameters, if they exist.
+            // Skip the first element because that is the command.
+            if (commandAndParameters.Length > 1)
+                parameters = commandAndParameters.Skip(1).ToArray();
+
+            // If the trailing part is valid add the trailing part to the
+            // end of the parameters.
+            if (!String.IsNullOrEmpty(trailing))
+                parameters = parameters.Concat(new string[] { trailing }).ToArray();
         }
         /*
         public int Port { get; set; }

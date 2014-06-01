@@ -60,9 +60,9 @@ namespace IrcBot
                         break;
                     case ConsoleKey.P:
                         PrintStatements();
-                        Statement statement = statements.Last();
-                        statement.Id = dbCon.insertStatement(statement);
-                        Console.WriteLine("PROGRAM: " + statement.Id);
+//                        Statement statement = statements.Last();
+//                        statement.Id = dbCon.insertStatement(statement);
+                        Console.WriteLine("PROGRAM: p");
                         break;
                 }
 
@@ -101,7 +101,7 @@ namespace IrcBot
             if (!exists)
             {
                 Statement statement = new Statement(message, DateTime.Now);
-//                statement.Id = dbCon.insertStatement(statement);
+                statement.Id = dbCon.insertStatement(statement);
                 statements.Add(statement);
             }
         }
