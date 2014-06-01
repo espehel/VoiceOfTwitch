@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -22,9 +23,11 @@ namespace IrcBot
             bot = new Bot("irc.freenode.net", 6667, "#espensChannel");
             statements = new List<Statement>();
             dbCon = new DatabaseConnection();
-            conString = Properties.Settings.Default.StatementsDatabaseConnectionString;
+//            conString = Properties.Settings.Default.StatementsDatabaseConnectionString;
+            Console.WriteLine(conString);
+            conString = @"Data Source=E:\Git\VoiceOfTwitch\IrcBot\StatementsDatabase.sdf";
             dbCon.connection_string = conString;
-            ds = dbCon.GetConnection;
+//            ds = dbCon.GetConnection;
 
         }
 
@@ -37,18 +40,18 @@ namespace IrcBot
             while (true)
             {
                 ConsoleKeyInfo c = Console.ReadKey(true);
-                Console.WriteLine("Program");
-                foreach (var statement in statements)
-                {
-                    ds.Tables[0].Rows.Add(setAsRow(statement));
-                }
-                try{
-                    dbCon.UpdateDatabase(ds);
-                }
-                    catch (Exception err)
-                {
-                    Console.WriteLine(err.Message);
-                }
+//                Console.WriteLine("Program");
+//                foreach (var statement in statements)
+//                {
+//                    ds.Tables[0].Rows.Add(setAsRow(statement));
+//                }
+//                try{
+//                    dbCon.UpdateDatabase(ds);
+//                }
+//                    catch (Exception err)
+//                {
+//                    Console.WriteLine(err.Message);
+//                }
                 switch (c.Key)
                 {
                     case ConsoleKey.Q: 
@@ -57,7 +60,9 @@ namespace IrcBot
                         break;
                     case ConsoleKey.P:
                         PrintStatements();
-                        Console.WriteLine("PROGRAM: p");
+                        Statement statement = statements.Last();
+                        statement.Id = dbCon.insertStatement(statement);
+                        Console.WriteLine("PROGRAM: " + statement.Id);
                         break;
                 }
 
@@ -86,15 +91,19 @@ namespace IrcBot
             {
                 if (statement.Equals(message))
                 {
-                    statement.Score++;
+                    statement.IncrementScore(1);
                     exists = true;
                 }
                 else if (statement.SimilarTo(message))
-                    statement.Score += 0.5;
+                    statement.IncrementScore(0.5);
 
             }
-            if(!exists)
-                statements.Add(new Statement(new Random().Next(),message,DateTime.Now));
+            if (!exists)
+            {
+                Statement statement = new Statement(message, DateTime.Now);
+//                statement.Id = dbCon.insertStatement(statement);
+                statements.Add(statement);
+            }
         }
 
         private DataRow setAsRow(Statement statement)

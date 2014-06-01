@@ -4,3 +4,6 @@ E:\Git\VoiceOfTwitch\IrcBot\bin\Debug\IrcBot.pdb
 E:\Git\VoiceOfTwitch\IrcBot\obj\Debug\IrcBot.csprojResolveAssemblyReference.cache
 E:\Git\VoiceOfTwitch\IrcBot\obj\Debug\IrcBot.exe
 E:\Git\VoiceOfTwitch\IrcBot\obj\Debug\IrcBot.pdb
+E:\Git\VoiceOfTwitch\IrcBot\bin\Debug\StatementsDatabase.sdf
+E:\Git\VoiceOfTwitch\IrcBot\bin\Debug\EntityFramework.dll
+E:\Git\VoiceOfTwitch\IrcBot\bin\Debug\EntityFramework.xml

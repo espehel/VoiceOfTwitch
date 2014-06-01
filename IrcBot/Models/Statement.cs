@@ -11,7 +11,7 @@ namespace IrcBot.Models
         public int Id { get; set; }
         public string Text { get; set; }
         public string[] Terms { get; private set; }
-        public double Score { get; set; }
+        public double Score { get; private set; }
         public DateTime CreatedAt { get; set; }
         public DateTime LastUpdated { get; set; }
 
@@ -24,11 +24,25 @@ namespace IrcBot.Models
             this.Score = 1;
             GenerateTerms();
         }
+        public Statement(string text, DateTime createdAt)
+        {
+            this.Text = text;
+            this.CreatedAt = createdAt;
+            this.LastUpdated = createdAt;
+            this.Score = 1;
+            GenerateTerms();
+        }
 
         private void GenerateTerms()
         {
             //TODO: use the text to make terms for finding similar texts
             Terms = Text.Split(new char[] {' '});
+        }
+
+        public void IncrementScore(double i)
+        {
+            Score += i;
+            LastUpdated = DateTime.Now;
         }
 
         public int CompareTo(string other)
