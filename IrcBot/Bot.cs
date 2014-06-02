@@ -29,7 +29,9 @@ namespace IrcBot
     private StreamReader reader;
     private StreamWriter writer;
     private Thread ircThread;
+    private Thread ThreadMessageEventThread;
     private List<IMessageListener> listeners;
+    private Pinger pinger;
   
         public Bot(string server, int port, string channel)
         {
@@ -45,7 +47,7 @@ namespace IrcBot
             stream = irc.GetStream();
             reader = new StreamReader(stream);
             writer = new StreamWriter(stream);
-            Pinger pinger = new Pinger(writer, Server);
+            pinger = new Pinger(writer, Server);
             pinger.Start();
             writer.WriteLine(USER);
             writer.Flush();
@@ -59,6 +61,7 @@ namespace IrcBot
         public void Stop()
         {
             ircThread.Abort();
+            pinger.Stop();
             // Close all streams
             writer.Close();
             reader.Close();
@@ -80,12 +83,15 @@ namespace IrcBot
 //                            Console.WriteLine("i = " + i + ": " + splitted[i]);
 //                        }
 //                        Statement statement = new Statement(0, splitted[splitted.Length - 1], DateTime.Now);
-//                        fireNewMessageEvent(splitted[splitted.Length - 1]);
-                        
+//                        FireNewMessageEvent(splitted[splitted.Length - 1]);
+
                         string trail = extractTrail(inputLine);
-                        if(trail != null)
-                            fireNewMessageEvent(trail);
+                        if (trail != null)
+                        {
+//                            new Thread(new ThreadStart(FireNewMessageEvent));
+                        new Thread(() => FireNewMessageEvent(trail)).Start();
                     }
+                }
                 }
                 catch (Exception ex)
                 {
@@ -97,12 +103,12 @@ namespace IrcBot
             }
         }
 
-        public void addListener(IMessageListener listener)
+        public void AddListener(IMessageListener listener)
         {
             listeners.Add(listener);
         }
 
-        private void fireNewMessageEvent(string message)
+        private void FireNewMessageEvent(string message)
         {
             foreach (var messageListener in listeners)
             {

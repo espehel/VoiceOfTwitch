@@ -13,7 +13,7 @@ namespace IrcBot
     {
         private string sql_string;
         private string strCon;
-//        SqlDataAdapter da_1;
+        SqlCeDataAdapter dataAdapter;
 
         public string Sql
         {
@@ -33,9 +33,9 @@ namespace IrcBot
 //        {
 //            SqlConnection con = new SqlConnection(strCon);
 //            con.Open();
-//            da_1 = new SqlDataAdapter(sql_string, con);
+//            dataAdapter = new SqlDataAdapter(sql_string, con);
 //            DataSet dat_set = new DataSet();
-//            da_1.Fill(dat_set, "Table_Data_1");
+//            dataAdapter.Fill(dat_set, "Table_Data_1");
 //
 //            con.Close();
 //
@@ -45,7 +45,7 @@ namespace IrcBot
 //
 //        public void UpdateDatabase(DataSet ds)
 //        {
-//            SqlCommandBuilder cb = new SqlCommandBuilder(da_1);
+//            SqlCommandBuilder cb = new SqlCommandBuilder(dataAdapter);
 //            cb.DataAdapter.Update(ds.Tables[0]);
 //        }
 
@@ -73,6 +73,48 @@ namespace IrcBot
                 myConnection.Close();
             }
             return Convert.ToInt32(o);
+        }
+
+        public List<Statement> FetchAllStatements()
+        {
+            List<Statement> statements = new List<Statement>();
+            SqlCeConnection con = new SqlCeConnection(strCon);
+                        con.Open();
+                        dataAdapter = new SqlCeDataAdapter("SELECT * FROM Statement", con);
+                        DataSet dataSet = new DataSet();
+                        dataAdapter.Fill(dataSet, "Statement");
+
+            foreach (DataRow row in dataSet.Tables[0].Rows)
+            {
+                Statement statement = new Statement(row[0],row[1],row[2],row[3],row[4]);
+                statements.Add(statement);
+            }            
+                        con.Close();
+            return statements;
+        }
+
+        public void UpdateStatements(List<Statement> statements )
+        {
+            Console.WriteLine("DBCON: updates statements");
+            using (SqlCeConnection conn = new SqlCeConnection(strCon))
+            {
+            try
+            {
+                conn.Open();
+                foreach (Statement statement in statements)
+                {
+                    SqlCeCommand UpdateCmd = new SqlCeCommand("UPDATE Statement SET score = @Score WHERE (id=@Id)", conn);
+                    UpdateCmd.Parameters.AddWithValue("@Score", statement.Score);
+                    UpdateCmd.Parameters.AddWithValue("@Id", statement.Id);
+                    UpdateCmd.ExecuteNonQuery();
+                }
+                conn.Close();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception.Message);
+            }
+            }
         }
     }
 }

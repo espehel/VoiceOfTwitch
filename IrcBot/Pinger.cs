@@ -36,5 +36,10 @@ namespace IrcBot
             Thread.Sleep(15000);
         }
     }
+
+        public void Stop()
+        {
+            pingSender.Abort();
+        }
     }
 }

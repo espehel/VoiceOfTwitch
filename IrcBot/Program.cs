@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using IrcBot.Models;
 
@@ -17,16 +18,17 @@ namespace IrcBot
         private DatabaseConnection dbCon;
         private DataSet ds;
         private string conString;
+        private Timer timer;
 
         public void Init()
         {
             bot = new Bot("irc.freenode.net", 6667, "#espensChannel");
-            statements = new List<Statement>();
             dbCon = new DatabaseConnection();
 //            conString = Properties.Settings.Default.StatementsDatabaseConnectionString;
-            Console.WriteLine(conString);
             conString = @"Data Source=E:\Git\VoiceOfTwitch\IrcBot\StatementsDatabase.sdf";
             dbCon.connection_string = conString;
+            statements = dbCon.FetchAllStatements();
+            timer = new Timer(TimerCallback,null,15000,15000);
 //            ds = dbCon.GetConnection;
 
         }
@@ -34,7 +36,7 @@ namespace IrcBot
         public void Run()
         {
             
-            bot.addListener(this);
+            bot.AddListener(this);
             bot.Start();
 
             while (true)
@@ -55,13 +57,14 @@ namespace IrcBot
                 switch (c.Key)
                 {
                     case ConsoleKey.Q: 
-                        bot.Stop(); 
+                        bot.Stop();
+                        
                         Console.WriteLine("PROGRAM: q");
+                        timer.Dispose();
+                        dbCon.UpdateStatements(statements);
                         break;
                     case ConsoleKey.P:
                         PrintStatements();
-//                        Statement statement = statements.Last();
-//                        statement.Id = dbCon.insertStatement(statement);
                         Console.WriteLine("PROGRAM: p");
                         break;
                 }
@@ -75,6 +78,10 @@ namespace IrcBot
 
             }
         }
+        private void TimerCallback(object state)
+        {
+            dbCon.UpdateStatements(statements);
+        }
 
         private void PrintStatements()
         {
@@ -87,8 +94,20 @@ namespace IrcBot
         public void NewMessage(string message)
         {
             bool exists = false;
-            foreach (var statement in statements)
+//            foreach (var statement in statements)
+//            {
+//                if (statement.Equals(message))
+//                {
+//                    statement.IncrementScore(1);
+//                    exists = true;
+//                }
+//                else if (statement.SimilarTo(message))
+//                    statement.IncrementScore(0.5);
+//
+//            }
+            Parallel.For(0, statements.Count, (i) =>
             {
+                Statement statement = statements[i];
                 if (statement.Equals(message))
                 {
                     statement.IncrementScore(1);
@@ -96,8 +115,7 @@ namespace IrcBot
                 }
                 else if (statement.SimilarTo(message))
                     statement.IncrementScore(0.5);
-
-            }
+            });
             if (!exists)
             {
                 Statement statement = new Statement(message, DateTime.Now);

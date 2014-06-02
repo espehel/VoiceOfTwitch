@@ -33,6 +33,16 @@ namespace IrcBot.Models
             GenerateTerms();
         }
 
+        public Statement(object id, object text, object createdAt, object lastUpdated, object score)
+        {
+            this.Id = Convert.ToInt32(id);
+            this.Text = (string) text;
+            this.CreatedAt = (DateTime) createdAt;
+            this.LastUpdated = (DateTime) lastUpdated;
+            this.Score = Convert.ToDouble(score);
+            GenerateTerms();
+        }
+
         private void GenerateTerms()
         {
             //TODO: use the text to make terms for finding similar texts
