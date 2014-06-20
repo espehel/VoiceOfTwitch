@@ -18,9 +18,10 @@ namespace IrcBot
     // Irc server's port (6667 is default port)
     private int Port { get; set; }
     // User information defined in RFC 2812 (Internet Relay Chat: Client Protocol) is sent to irc server 
-    private string USER = "USER CSharpBot 8 * :I'm a C# irc bot";
-    // Bot's nickname
-    private string nick = "EspenBot";
+    private string user = @"USER CSharpBot 8 * :I'm a C# irc bot";
+    private string pass = Properties.Settings.Default.TwitchAuth;
+    // Bot's nickname   
+    private string nick = "Espen307";
     // Channel to join
     private string Channel { get; set; }
     private NetworkStream stream;
@@ -49,9 +50,11 @@ namespace IrcBot
             writer = new StreamWriter(stream);
             pinger = new Pinger(writer, Server);
             pinger.Start();
-            writer.WriteLine(USER);
+            writer.WriteLine("PASS " + pass);
             writer.Flush();
             writer.WriteLine("NICK " + nick);
+            writer.Flush();
+            writer.WriteLine("USER " + user);
             writer.Flush();
             writer.WriteLine("JOIN " + Channel);
             writer.Flush();
@@ -86,7 +89,7 @@ namespace IrcBot
 //                        FireNewMessageEvent(splitted[splitted.Length - 1]);
 
                         string trail = extractTrail(inputLine);
-                        if (trail != null)
+                        if (trail != null && trail.Length<400)
                         {
 //                            new Thread(new ThreadStart(FireNewMessageEvent));
                         new Thread(() => FireNewMessageEvent(trail)).Start();
@@ -129,6 +132,9 @@ namespace IrcBot
             else
                 trailingStart = message.Length;
 
+            //weird bug makes it less than 0 sometimes
+            if (trailingStart - prefixEnd - 1 < 0)
+                return null;
             string[] commandAndParameters = message.Substring(prefixEnd + 1, trailingStart - prefixEnd - 1).Split(' ');
 
             string command = commandAndParameters[0];

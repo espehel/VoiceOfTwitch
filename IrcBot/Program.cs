@@ -19,16 +19,20 @@ namespace IrcBot
         private DataSet ds;
         private string conString;
         private Timer timer;
+        private int counter = 0;
 
         public void Init()
         {
-            bot = new Bot("irc.freenode.net", 6667, "#espensChannel");
+            //bot = new Bot("irc.freenode.net", 6667, "#espensChannel");
+            bot = new Bot("irc.twitch.tv",6667,"#d2l");
             dbCon = new DatabaseConnection();
-//            conString = Properties.Settings.Default.StatementsDatabaseConnectionString;
-            conString = @"Data Source=E:\Git\VoiceOfTwitch\IrcBot\StatementsDatabase.sdf";
+            conString = Properties.Settings.Default.StatementsDatabaseConnectionString;
+//            conString = @"Data Source=E:\Git\VoiceOfTwitch\IrcBot\StatementsDatabase.sdf";
+            //conString = @"Data Source=C:\Users\Espen\Documents\StatementsDatabase.sdf";
             dbCon.connection_string = conString;
+            Console.WriteLine("PROGRAM: Deleted " + dbCon.ClearStatements() + " rows.");
             statements = dbCon.FetchAllStatements();
-            timer = new Timer(TimerCallback,null,15000,15000);
+            timer = new Timer(TimerCallback,null,30000,30000);
 //            ds = dbCon.GetConnection;
 
         }
@@ -61,7 +65,7 @@ namespace IrcBot
                         
                         Console.WriteLine("PROGRAM: q");
                         timer.Dispose();
-                        dbCon.UpdateStatements(statements);
+                        dbCon.UpdateStatements(statements,counter);
                         break;
                     case ConsoleKey.P:
                         PrintStatements();
@@ -80,7 +84,9 @@ namespace IrcBot
         }
         private void TimerCallback(object state)
         {
-            dbCon.UpdateStatements(statements);
+            dbCon.UpdateStatements(statements,counter);
+            dbCon.ClearStatements(2);
+            statements = dbCon.FetchAllStatements();
         }
 
         private void PrintStatements()
@@ -105,23 +111,24 @@ namespace IrcBot
 //                    statement.IncrementScore(0.5);
 //
 //            }
+            Statement newStatement = new Statement(message, DateTime.Now);
             Parallel.For(0, statements.Count, (i) =>
             {
-                Statement statement = statements[i];
-                if (statement.Equals(message))
+                Statement oldStatement = statements[i];
+                if (oldStatement.Equals(message))
                 {
-                    statement.IncrementScore(1);
+                    oldStatement.IncrementScore(1);
                     exists = true;
                 }
-                else if (statement.SimilarTo(message))
-                    statement.IncrementScore(0.5);
+                else
+                    oldStatement.SimilarTo(newStatement);
             });
             if (!exists)
             {
-                Statement statement = new Statement(message, DateTime.Now);
-                statement.Id = dbCon.insertStatement(statement);
-                statements.Add(statement);
+                newStatement.Id = dbCon.insertStatement(newStatement);
+                statements.Add(newStatement);
             }
+            counter++;
         }
 
         private DataRow setAsRow(Statement statement)

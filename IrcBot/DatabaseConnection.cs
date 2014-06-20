@@ -23,31 +23,6 @@ namespace IrcBot
         {
             set { strCon = value; }
         }
-//        public DataSet GetConnection
-//        {
-//
-//            get { return MyDataSet(); }
-//
-//        }
-//        private DataSet MyDataSet()
-//        {
-//            SqlConnection con = new SqlConnection(strCon);
-//            con.Open();
-//            dataAdapter = new SqlDataAdapter(sql_string, con);
-//            DataSet dat_set = new DataSet();
-//            dataAdapter.Fill(dat_set, "Table_Data_1");
-//
-//            con.Close();
-//
-//            return dat_set;
-//
-//        }
-//
-//        public void UpdateDatabase(DataSet ds)
-//        {
-//            SqlCommandBuilder cb = new SqlCommandBuilder(dataAdapter);
-//            cb.DataAdapter.Update(ds.Tables[0]);
-//        }
 
         public int insertStatement(Statement statement)
         {
@@ -58,9 +33,7 @@ namespace IrcBot
 
             using (SqlCeConnection myConnection = new SqlCeConnection(strCon))
             {
-                Console.WriteLine("DATABASE: " + myConnection.ConnectionString);
                 myConnection.Open();
-                Console.WriteLine("DATABASE: Open");
                 SqlCeCommand myCommand = new SqlCeCommand(insertSql, myConnection);
                 myCommand.Parameters.AddWithValue("@text", statement.Text);
                 myCommand.Parameters.AddWithValue("@createdAt", statement.CreatedAt);
@@ -86,16 +59,19 @@ namespace IrcBot
 
             foreach (DataRow row in dataSet.Tables[0].Rows)
             {
-                Statement statement = new Statement(row[0],row[1],row[2],row[3],row[4]);
+                //Statement statement = new Statement(row[0],row[1],row[2],row[3],row[4]);
+                Statement statement = new Statement(row[0], row[1], row[4], row[3], row[2]);
                 statements.Add(statement);
             }            
-                        con.Close();
+            con.Close();
+            Console.WriteLine("DBCON: fetched " + statements.Count + " statements");
             return statements;
         }
 
-        public void UpdateStatements(List<Statement> statements )
+        public void UpdateStatements(List<Statement> statements, int counter)
         {
-            Console.WriteLine("DBCON: updates statements");
+            //TODO: clear database, insert top statements, delete rest
+            Console.WriteLine("DBCON: updates statements [" + counter+"]");
             using (SqlCeConnection conn = new SqlCeConnection(strCon))
             {
             try
@@ -115,6 +91,30 @@ namespace IrcBot
                 Console.WriteLine(exception.Message);
             }
             }
+            Console.WriteLine("DBCON: updates statements [" + counter+"]");
+        }
+        public int ClearStatements()
+        {
+            string sql = "DELETE Statement";
+            SqlCeConnection con = new SqlCeConnection(strCon);
+            con.Open();
+            SqlCeCommand myCommand = new SqlCeCommand(sql, con);
+            int rowsDeleted = myCommand.ExecuteNonQuery();
+            con.Close();
+            Console.WriteLine("DBCON: deleted " + rowsDeleted + " statements");
+            return rowsDeleted;
+        }
+        public int ClearStatements(int threshold)
+        {
+            string sql = "DELETE Statement WHERE (score < @Threshold)";
+            SqlCeConnection con = new SqlCeConnection(strCon);
+            con.Open();
+            SqlCeCommand myCommand = new SqlCeCommand(sql, con);
+            myCommand.Parameters.AddWithValue("@Threshold",threshold);
+            int rowsDeleted = myCommand.ExecuteNonQuery();
+            con.Close();
+            Console.WriteLine("DBCON: deleted " + rowsDeleted +" statements");
+            return rowsDeleted;
         }
     }
 }

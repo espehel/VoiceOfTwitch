@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IrcBot.Models
 {
-    class Statement : IComparable<String>
+    internal class Statement : IComparable<String>
     {
         public int Id { get; set; }
         public string Text { get; set; }
@@ -24,6 +24,7 @@ namespace IrcBot.Models
             this.Score = 1;
             GenerateTerms();
         }
+
         public Statement(string text, DateTime createdAt)
         {
             this.Text = text;
@@ -46,7 +47,7 @@ namespace IrcBot.Models
         private void GenerateTerms()
         {
             //TODO: use the text to make terms for finding similar texts
-            Terms = Text.Split(new char[] {' '});
+            Terms = IndexingUtils.extractTerms(Text);
         }
 
         public void IncrementScore(double i)
@@ -78,10 +79,64 @@ namespace IrcBot.Models
 
         }
 
-        public bool SimilarTo(string message)
+        public void SimilarTo(Statement other)
         {
+            //https://fuzzystring.codeplex.com/
+            double simScore = 0;
+            if (checkCase(other.Text))
+                simScore = calcNewScore(simScore);
             // TODO: make a algorithm to check similarity
-            return false;
+            if (checkHammingDistance(other.Terms))
+                simScore = calcNewScore(simScore);
+            IncrementScore(simScore);
+            other.IncrementScore(simScore);
+        }
+        private double calcNewScore(double score)
+        {
+            if (score == 0)
+                return 0.5;
+            else
+            {
+                return score + (1 - score) * (1 - score);
+            }
+        }
+
+        private bool checkCase(string message)
+        {
+            return Text.Equals(message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private bool checkHammingDistance(string[] otherTerms)
+        {
+            if(this.Terms.Count() == otherTerms.Count())
+                for (int i = 0; i < this.Terms.Count(); i++)
+                {
+                    if (!checkHammingDistance(this.Terms[i], this.Terms[i], 2))
+                        return false;
+                }
+            else
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private bool checkHammingDistance(string source, string target, int upperLimit)
+        {
+            int distance = 0;
+
+            if (source.Length == target.Length)
+            {
+                for (int i = 0; i < source.Length; i++)
+                {
+                    if (!source[i].Equals(target[i]))
+                    {
+                        distance++;
+                    }
+                }
+                return distance <= upperLimit;
+            }
+            else { return false; }
         }
     }
 }

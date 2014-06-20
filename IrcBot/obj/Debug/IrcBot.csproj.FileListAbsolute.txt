@@ -7,3 +7,11 @@ E:\Git\VoiceOfTwitch\IrcBot\obj\Debug\IrcBot.pdb
 E:\Git\VoiceOfTwitch\IrcBot\bin\Debug\StatementsDatabase.sdf
 E:\Git\VoiceOfTwitch\IrcBot\bin\Debug\EntityFramework.dll
 E:\Git\VoiceOfTwitch\IrcBot\bin\Debug\EntityFramework.xml
+C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\bin\Debug\IrcBot.exe.config
+C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\obj\Debug\IrcBot.exe
+C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\obj\Debug\IrcBot.pdb
+C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\bin\Debug\IrcBot.exe
+C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\bin\Debug\IrcBot.pdb
+C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\bin\Debug\EntityFramework.dll
+C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\bin\Debug\EntityFramework.xml
+C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\obj\Debug\IrcBot.csprojResolveAssemblyReference.cache

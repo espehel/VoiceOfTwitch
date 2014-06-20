@@ -26,10 +26,19 @@ namespace IrcBot.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
-        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=|DataDirectory|\\StatementsDatabase.sdf")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=C:\\Users\\Espen\\Documents\\StatementsDatabase.sdf")]
         public string StatementsDatabaseConnectionString {
             get {
                 return ((string)(this["StatementsDatabaseConnectionString"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("oauth:arzn22p9nyk8laep9t5jj8ccz42w3z4")]
+        public string TwitchAuth {
+            get {
+                return ((string)(this["TwitchAuth"]));
             }
         }
     }

@@ -67,6 +67,7 @@
   <ItemGroup>
     <Compile Include="DatabaseConnection.cs" />
     <Compile Include="IMessageListener.cs" />
+    <Compile Include="IndexingUtils.cs" />
     <Compile Include="Models\Statement.cs" />
     <Compile Include="Pinger.cs" />
     <Compile Include="Program.cs" />
@@ -77,11 +78,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="StatementsDatabaseDataSet.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>StatementsDatabaseDataSet.xsd</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -90,25 +86,9 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="StatementsDatabaseDataSet.xsc">
-      <DependentUpon>StatementsDatabaseDataSet.xsd</DependentUpon>
-    </None>
-    <None Include="StatementsDatabaseDataSet.xsd">
-      <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>StatementsDatabaseDataSet.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="StatementsDatabaseDataSet.xss">
-      <DependentUpon>StatementsDatabaseDataSet.xsd</DependentUpon>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="StatementsDatabase.sdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
