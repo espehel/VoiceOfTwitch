@@ -8,39 +8,32 @@ namespace IrcBot.Models
 {
     internal class Statement : IComparable<String>
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string Text { get; set; }
         public string[] Terms { get; private set; }
         public double Score { get; private set; }
+        public long Occurrences { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime LastUpdated { get; set; }
 
-        public Statement(int id, string text, DateTime createdAt)
+        public Statement(string text)
         {
-            this.Id = id;
             this.Text = text;
-            this.CreatedAt = createdAt;
-            this.LastUpdated = createdAt;
+            this.CreatedAt = DateTime.Now;
+            this.LastUpdated = DateTime.Now;
             this.Score = 1;
+            this.Occurrences = 1;
             GenerateTerms();
         }
 
-        public Statement(string text, DateTime createdAt)
+        public Statement(object id, object text, object createdAt, object lastUpdated, object score, object occurences)
         {
-            this.Text = text;
-            this.CreatedAt = createdAt;
-            this.LastUpdated = createdAt;
-            this.Score = 1;
-            GenerateTerms();
-        }
-
-        public Statement(object id, object text, object createdAt, object lastUpdated, object score)
-        {
-            this.Id = Convert.ToInt32(id);
+            this.Id = Convert.ToInt64(id);
             this.Text = (string) text;
             this.CreatedAt = (DateTime) createdAt;
             this.LastUpdated = (DateTime) lastUpdated;
             this.Score = Convert.ToDouble(score);
+            this.Occurrences = Convert.ToInt64(occurences);
             GenerateTerms();
         }
 
@@ -108,6 +101,7 @@ namespace IrcBot.Models
 
         private bool checkHammingDistance(string[] otherTerms)
         {
+            //TODO: reward longer words and sentences more.
             if(this.Terms.Count() == otherTerms.Count())
                 for (int i = 0; i < this.Terms.Count(); i++)
                 {

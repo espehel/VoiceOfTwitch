@@ -24,9 +24,9 @@ namespace IrcBot
             set { strCon = value; }
         }
 
-        public int insertStatement(Statement statement)
+        public long insertStatement(Statement statement)
         {
-            string insertSql = @"INSERT INTO Statement(text,createdAt,lastUpdated,score) VALUES(@text, @createdAt, @lastUpdated,@score)";
+            string insertSql = @"INSERT INTO Statement(text,createdAt,lastUpdated,score,occurrences) VALUES(@text, @createdAt, @lastUpdated, @score, @occurrences)";
 //            string identity = @"SELECT id FROM Statement WHERE id = @@IDENTITY";
             string identitySql = @"SELECT @@IDENTITY AS ID";
             Object o;
@@ -39,13 +39,14 @@ namespace IrcBot
                 myCommand.Parameters.AddWithValue("@createdAt", statement.CreatedAt);
                 myCommand.Parameters.AddWithValue("@lastUpdated", statement.LastUpdated);
                 myCommand.Parameters.AddWithValue("@score", statement.Score);
+                myCommand.Parameters.AddWithValue("@occurrences", statement.Occurrences);
                 myCommand.ExecuteNonQuery();
 
                 myCommand = new SqlCeCommand(identitySql,myConnection);
                 o = myCommand.ExecuteScalar();
                 myConnection.Close();
             }
-            return Convert.ToInt32(o);
+            return Convert.ToInt64(o);
         }
 
         public List<Statement> FetchAllStatements()
@@ -60,7 +61,7 @@ namespace IrcBot
             foreach (DataRow row in dataSet.Tables[0].Rows)
             {
                 //Statement statement = new Statement(row[0],row[1],row[2],row[3],row[4]);
-                Statement statement = new Statement(row[0], row[1], row[4], row[3], row[2]);
+                Statement statement = new Statement(row[0], row[1], row[4], row[3], row[2], row[5]);
                 statements.Add(statement);
             }            
             con.Close();
@@ -79,9 +80,11 @@ namespace IrcBot
                 conn.Open();
                 foreach (Statement statement in statements)
                 {
-                    SqlCeCommand UpdateCmd = new SqlCeCommand("UPDATE Statement SET score = @Score WHERE (id=@Id)", conn);
+                    SqlCeCommand UpdateCmd = new SqlCeCommand("UPDATE Statement SET score = @Score, lastUpdated = @LastUpdated, occurrences = @Occurrences WHERE (id=@Id)", conn);
                     UpdateCmd.Parameters.AddWithValue("@Score", statement.Score);
                     UpdateCmd.Parameters.AddWithValue("@Id", statement.Id);
+                    UpdateCmd.Parameters.AddWithValue("@LastUpdated", statement.LastUpdated);
+                    UpdateCmd.Parameters.AddWithValue("@Occurrences", statement.Occurrences);
                     UpdateCmd.ExecuteNonQuery();
                 }
                 conn.Close();

@@ -24,7 +24,7 @@ namespace IrcBot
         public void Init()
         {
             //bot = new Bot("irc.freenode.net", 6667, "#espensChannel");
-            bot = new Bot("irc.twitch.tv",6667,"#d2l");
+            bot = new Bot("irc.twitch.tv", 6667, "#beyondthesummit3");
             dbCon = new DatabaseConnection();
             conString = Properties.Settings.Default.StatementsDatabaseConnectionString;
 //            conString = @"Data Source=E:\Git\VoiceOfTwitch\IrcBot\StatementsDatabase.sdf";
@@ -100,24 +100,15 @@ namespace IrcBot
         public void NewMessage(string message)
         {
             bool exists = false;
-//            foreach (var statement in statements)
-//            {
-//                if (statement.Equals(message))
-//                {
-//                    statement.IncrementScore(1);
-//                    exists = true;
-//                }
-//                else if (statement.SimilarTo(message))
-//                    statement.IncrementScore(0.5);
-//
-//            }
-            Statement newStatement = new Statement(message, DateTime.Now);
+
+            Statement newStatement = new Statement(message);
             Parallel.For(0, statements.Count, (i) =>
             {
                 Statement oldStatement = statements[i];
                 if (oldStatement.Equals(message))
                 {
-                    oldStatement.IncrementScore(1);
+                    oldStatement.IncrementScore(10);
+                    oldStatement.Occurrences++;
                     exists = true;
                 }
                 else
@@ -131,14 +122,14 @@ namespace IrcBot
             counter++;
         }
 
-        private DataRow setAsRow(Statement statement)
-        {
-            DataRow row = ds.Tables[0].NewRow();
-            row[1] = statement.Text;
-            row[2] = statement.CreatedAt;
-            row[3] = statement.LastUpdated;
-            return row;
-        }
+        //private DataRow setAsRow(Statement statement)
+        //{
+        //    DataRow row = ds.Tables[0].NewRow();
+        //    row[1] = statement.Text;
+        //    row[2] = statement.CreatedAt;
+        //    row[3] = statement.LastUpdated;
+        //    return row;
+        //}
         static void Main(string[] args)
         {
             var program = new Program();
