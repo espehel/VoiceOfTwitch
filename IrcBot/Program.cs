@@ -107,7 +107,7 @@ namespace IrcBot
                 Statement oldStatement = statements[i];
                 if (oldStatement.Equals(message))
                 {
-                    oldStatement.IncrementScore(10);
+                    oldStatement.IncrementScore(1);
                     oldStatement.Occurrences++;
                     exists = true;
                 }
