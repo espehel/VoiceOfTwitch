@@ -116,7 +116,9 @@ namespace IrcBot.Models
                         upperLimit = 2;
                     
                     if (checkHammingDistance(this.Terms[i], this.Terms[i], upperLimit))
-                        score += 0.1;
+                        score += 0.01;
+                    else
+                        return 0;
                 }
 
             return score;

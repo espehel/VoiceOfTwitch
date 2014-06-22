@@ -24,7 +24,7 @@ namespace IrcBot
         public void Init()
         {
             //bot = new Bot("irc.freenode.net", 6667, "#espensChannel");
-            bot = new Bot("irc.twitch.tv", 6667, "#beyondthesummit3");
+            bot = new Bot("irc.twitch.tv", 6667, "#beyondthesummit");
             dbCon = new DatabaseConnection();
             conString = Properties.Settings.Default.StatementsDatabaseConnectionString;
 //            conString = @"Data Source=E:\Git\VoiceOfTwitch\IrcBot\StatementsDatabase.sdf";
