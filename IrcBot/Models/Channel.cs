@@ -12,6 +12,7 @@ namespace IrcBot.Models
         public string Name { get; set; }
         public DateTime StartedAt { get; set; }
         public DateTime CreatedAt { get; set; }
+        //TODO: add if live
 
         public Channel(string name, DateTime startedAt, DateTime createdAt)
         {

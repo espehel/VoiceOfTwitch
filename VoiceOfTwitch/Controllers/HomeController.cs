@@ -11,19 +11,23 @@ namespace VoiceOfTwitch.Controllers
 {
     public class HomeController : Controller
     {
-        //private StatementsDatabaseEntities statementDB = new StatementsDatabaseEntities();
-        private StatementsDatabaseEntities1 statementDB = new StatementsDatabaseEntities1();
+        private readonly VoiceDatabaseEntities _voiceDatabaseEntities = new VoiceDatabaseEntities();
         public ActionResult Index()
         {
             ViewBag.Title = "Voice of Twitch";
             ViewBag.Message = "Experience the common voice of Twitch chat!";
-            List<Statement> list = statementDB.Statements.ToList();
-            list.Sort(StatementComparer.OrderByTop);
+            List<Channel> list = _voiceDatabaseEntities.Channels.ToList();
             return View(list);
+        }
+
+        public ActionResult Channel(int id)
+        {
+            TempData["channel"] = id;
+            return RedirectToAction("Livedata", "Statements");
         }
         public PartialViewResult Details(int id)
         {
-            Statement model = statementDB.Statements.Find(id);
+            Statement model = _voiceDatabaseEntities.Statements.Find(id);
             return PartialView(model);
         }
 

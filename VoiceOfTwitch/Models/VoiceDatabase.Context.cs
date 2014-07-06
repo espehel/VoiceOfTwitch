@@ -13,10 +13,10 @@ namespace VoiceOfTwitch.Models
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class StatementsDatabaseEntities1 : DbContext
+    public partial class VoiceDatabaseEntities : DbContext
     {
-        public StatementsDatabaseEntities1()
-            : base("name=StatementsDatabaseEntities1")
+        public VoiceDatabaseEntities()
+            : base("name=VoiceDatabaseEntities")
         {
         }
     
@@ -25,6 +25,7 @@ namespace VoiceOfTwitch.Models
             throw new UnintentionalCodeFirstException();
         }
     
+        public DbSet<Channel> Channels { get; set; }
         public DbSet<Statement> Statements { get; set; }
     }
 }

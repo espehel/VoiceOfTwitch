@@ -68,6 +68,7 @@
     <Compile Include="DatabaseConnection.cs" />
     <Compile Include="IMessageListener.cs" />
     <Compile Include="IndexingUtils.cs" />
+    <Compile Include="Models\Channel.cs" />
     <Compile Include="Models\Statement.cs" />
     <Compile Include="Pinger.cs" />
     <Compile Include="Program.cs" />

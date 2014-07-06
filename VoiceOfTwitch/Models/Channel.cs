@@ -12,14 +12,11 @@ namespace VoiceOfTwitch.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Statement
+    public partial class Channel
     {
         public long id { get; set; }
-        public string text { get; set; }
-        public Nullable<float> score { get; set; }
-        public Nullable<System.DateTime> lastUpdated { get; set; }
+        public string name { get; set; }
+        public Nullable<System.DateTime> startedAt { get; set; }
         public Nullable<System.DateTime> createdAt { get; set; }
-        public Nullable<long> occurrences { get; set; }
-        public long channelId { get; set; }
     }
 }

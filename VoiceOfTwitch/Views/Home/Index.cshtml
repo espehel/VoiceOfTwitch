@@ -1,5 +1,5 @@
 ﻿
-@model List<VoiceOfTwitch.Models.Statement>
+@model List<VoiceOfTwitch.Models.Channel>
 @section featured {
     <section class="featured">
         <div class="content-wrapper">
@@ -17,22 +17,14 @@
         </div>
     </section>
 }
-<h3>Statements:</h3>
-@foreach (var statement in Model)
+<h3>Channels:</h3>
+@foreach (var channel in Model)
 {
     <ol class="round">
         <li class="exclamation">
             <h5 class="statement">
-            @Ajax.ActionLink(@statement.text,"Details",new {id = statement.id},new AjaxOptions { HttpMethod = "GET", 
-                 InsertionMode = InsertionMode.Replace, UpdateTargetId = "details_"+statement.id })
+            @Html.ActionLink(@channel.name,"Channel",new {id = channel.id})
             </h5>
-            <div id="details_@statement.id"></div>
-
         </li>
     </ol>
-    
-    
-}
-@section scripts{
-    @Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
 }

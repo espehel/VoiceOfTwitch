@@ -10,7 +10,8 @@ namespace VoiceOfTwitch.Controllers
 {
     public class StatementsController : Controller
     {
-        private readonly StatementsDatabaseEntities1 _statementDb = new StatementsDatabaseEntities1();
+        private readonly VoiceDatabaseEntities _voiceDatabaseEntities = new VoiceDatabaseEntities();
+        private long _channelId = -1;
 
         //
         // GET: /Statements/Index
@@ -25,10 +26,14 @@ namespace VoiceOfTwitch.Controllers
         // GET: /Statements/Livedata/{ordering}
         public ActionResult Livedata(string ordering)//default value top
         {
+            if (TempData["channel"] != null)
+            {
+                _channelId = Convert.ToInt64(TempData["channel"]);
+            }
 
             ViewBag.Title = "Voice of Twitch";
             ViewBag.Message = "Experience the common voice of Twitch chat live!";
-            var list = _statementDb.Statements.ToList();
+            var list = _voiceDatabaseEntities.Statements.Where(statement => statement.channelId == _channelId).ToList();
             var caseSwitch = ordering.ToLower();
             switch (caseSwitch)
             {
@@ -47,7 +52,7 @@ namespace VoiceOfTwitch.Controllers
         }
         public PartialViewResult Details(int id)
         {
-            Statement model = _statementDb.Statements.Find(id);
+            Statement model = _voiceDatabaseEntities.Statements.Find(id);
             return PartialView(model);
         }
 
