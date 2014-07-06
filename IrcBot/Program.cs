@@ -20,17 +20,24 @@ namespace IrcBot
         private string conString;
         private Timer timer;
         private int counter = 0;
+        private Channel channel;
 
-        public void Init()
+        public void Init(string channelName)
         {
             //bot = new Bot("irc.freenode.net", 6667, "#espensChannel");
-            bot = new Bot("irc.twitch.tv", 6667, "#beyondthesummit");
+            bot = new Bot("irc.twitch.tv", 6667, "#"+channelName);
             dbCon = new DatabaseConnection();
             conString = Properties.Settings.Default.StatementsDatabaseConnectionString;
 //            conString = @"Data Source=E:\Git\VoiceOfTwitch\IrcBot\StatementsDatabase.sdf";
             //conString = @"Data Source=C:\Users\Espen\Documents\StatementsDatabase.sdf";
             dbCon.connection_string = conString;
             Console.WriteLine("PROGRAM: Deleted " + dbCon.ClearStatements() + " rows.");
+            channel = new Channel(channelName,DateTime.Now,DateTime.Now);
+            var id = dbCon.InsertChannel(channel);
+            if (id == -1)
+                dbCon.UpdateChannel(channel);
+            else
+                channel.Id = id;
             statements = dbCon.FetchAllStatements();
             timer = new Timer(TimerCallback,null,30000,30000);
 //            ds = dbCon.GetConnection;
@@ -116,6 +123,7 @@ namespace IrcBot
             });
             if (!exists)
             {
+                newStatement.ChannelId = channel.Id;
                 newStatement.Id = dbCon.insertStatement(newStatement);
                 statements.Add(newStatement);
             }
@@ -133,7 +141,7 @@ namespace IrcBot
         static void Main(string[] args)
         {
             var program = new Program();
-            program.Init();
+            program.Init("beyondthesummit");
             program.Run();
         }
     }

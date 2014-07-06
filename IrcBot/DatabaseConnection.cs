@@ -26,7 +26,7 @@ namespace IrcBot
 
         public long insertStatement(Statement statement)
         {
-            string insertSql = @"INSERT INTO Statement(text,createdAt,lastUpdated,score,occurrences) VALUES(@text, @createdAt, @lastUpdated, @score, @occurrences)";
+            string insertSql = @"INSERT INTO Statement(text,createdAt,lastUpdated,score,occurrences,channelId) VALUES(@text, @createdAt, @lastUpdated, @score, @occurrences, @channelId)";
 //            string identity = @"SELECT id FROM Statement WHERE id = @@IDENTITY";
             string identitySql = @"SELECT @@IDENTITY AS ID";
             Object o;
@@ -40,6 +40,7 @@ namespace IrcBot
                 myCommand.Parameters.AddWithValue("@lastUpdated", statement.LastUpdated);
                 myCommand.Parameters.AddWithValue("@score", statement.Score);
                 myCommand.Parameters.AddWithValue("@occurrences", statement.Occurrences);
+                myCommand.Parameters.AddWithValue("@channelId", statement.ChannelId);
                 myCommand.ExecuteNonQuery();
 
                 myCommand = new SqlCeCommand(identitySql,myConnection);
@@ -118,6 +119,74 @@ namespace IrcBot
             con.Close();
             Console.WriteLine("DBCON: deleted " + rowsDeleted +" statements");
             return rowsDeleted;
+        }
+        public List<Channel> FetchAllChannels()
+        {
+            List<Channel> channels = new List<Channel>();
+            SqlCeConnection con = new SqlCeConnection(strCon);
+            con.Open();
+            dataAdapter = new SqlCeDataAdapter("SELECT * FROM Channel", con);
+            DataSet dataSet = new DataSet();
+            dataAdapter.Fill(dataSet, "Channel");
+
+            foreach (DataRow row in dataSet.Tables[0].Rows)
+            {
+                //Statement statement = new Statement(row[0],row[1],row[2],row[3],row[4]);
+                Channel channel = new Channel(row[0], row[1], row[2], row[3]);
+                channels.Add(channel);
+            }
+            con.Close();
+            Console.WriteLine("DBCON: fetched " + channels.Count + " channels");
+            return channels;
+        }
+        public long InsertChannel(Channel channel)
+        {
+            List<Channel> channels = FetchAllChannels();
+            foreach (var chan in channels)
+            {
+                if (chan.Name.Equals(channel.Name))
+                    return -1;
+            }
+
+            string insertSql = @"INSERT INTO Channel(name,startedAt,createdAt) VALUES(@name, @startedAt, @createdAt)";
+            //            string identity = @"SELECT id FROM Statement WHERE id = @@IDENTITY";
+            string identitySql = @"SELECT @@IDENTITY AS ID";
+            Object o;
+
+            using (SqlCeConnection myConnection = new SqlCeConnection(strCon))
+            {
+                myConnection.Open();
+                SqlCeCommand myCommand = new SqlCeCommand(insertSql, myConnection);
+                myCommand.Parameters.AddWithValue("@text", channel.Name);
+                myCommand.Parameters.AddWithValue("@startedAt", channel.StartedAt);
+                myCommand.Parameters.AddWithValue("@createdAt", channel.CreatedAt);
+                myCommand.ExecuteNonQuery();
+
+                myCommand = new SqlCeCommand(identitySql, myConnection);
+                o = myCommand.ExecuteScalar();
+                myConnection.Close();
+            }
+            return Convert.ToInt64(o);
+        }
+
+        public void UpdateChannel(Channel channel)
+        {
+            using (SqlCeConnection conn = new SqlCeConnection(strCon))
+            {
+                try
+                {
+                    conn.Open();
+                        SqlCeCommand UpdateCmd = new SqlCeCommand("UPDATE Channel SET startedAt = @startedAt WHERE (name=@name)", conn);
+                    UpdateCmd.Parameters.AddWithValue("@startedAt", channel.StartedAt);
+                    UpdateCmd.Parameters.AddWithValue("@name",channel.Name);
+                    UpdateCmd.ExecuteNonQuery();
+                    conn.Close();
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine(exception.Message);
+                }
+            }
         }
     }
 }

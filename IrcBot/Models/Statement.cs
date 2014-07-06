@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace IrcBot.Models
 {
-    internal class Statement : IComparable<String>
+    public class Statement : IComparable<String>
     {
         public long Id { get; set; }
         public string Text { get; set; }
@@ -16,6 +16,7 @@ namespace IrcBot.Models
         public long Occurrences { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime LastUpdated { get; set; }
+        public long ChannelId { get; set; }
 
         public Statement(string text)
         {
