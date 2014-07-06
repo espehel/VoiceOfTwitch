@@ -1,0 +1,49 @@
+﻿@model List<VoiceOfTwitch.Models.Statement>
+@section featured {
+    <section class="featured">
+        <div class="content-wrapper">
+            <hgroup class="title">
+                <h1>@ViewBag.Title.</h1>
+                <h2>@ViewBag.Message</h2>
+            </hgroup>
+            <p>
+                Here you will be able to find meta data about the channel that is being monitored. 
+                There should also be a link to the channel.<br/>
+                For instance: 
+                <a href="http://twitch.tv/beyondthesummit" title="BeyondTheSummit">BeyondTheSummit</a>.<br/>
+                I would also like to present number of viewers and how long the monitoring has been in action.
+            </p>
+        </div>
+    </section>
+}
+
+<div class="orderNav">
+
+    <nav>
+        <ul id="orderMenu">
+            <li>@Html.ActionLink("Top", "Livedata", "Statements",new {ordering = "top"},null)</li>
+            <li>@Html.ActionLink("Count", "Livedata", "Statements",new {ordering = "count"},null)</li>
+            <li>@Html.ActionLink("Hot", "Livedata", "Statements")</li>
+        </ul>
+    </nav>
+</div>
+<br/>
+<h3>Statements:</h3>
+@foreach (var statement in Model)
+{
+    <ol class="round">
+        <li class="exclamation">
+            <h5 class="statement">
+            @Ajax.ActionLink(@statement.text,"Details",new {id = statement.id},new AjaxOptions { HttpMethod = "GET", 
+                 InsertionMode = InsertionMode.Replace, UpdateTargetId = "details_"+statement.id })
+            </h5>
+            <div id="details_@statement.id"></div>
+
+        </li>
+    </ol>
+    
+    
+}
+@section scripts{
+    @Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
+}
