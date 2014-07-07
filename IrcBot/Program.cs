@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -22,8 +23,10 @@ namespace IrcBot
         private int counter = 0;
         private Channel channel;
 
-        public void Init(string channelName)
+        public void Init(StartConfig config)
         {
+
+            string channelName = config.ChannesList[0];
             //bot = new Bot("irc.freenode.net", 6667, "#espensChannel");
             bot = new Bot("irc.twitch.tv", 6667, "#"+channelName);
             dbCon = new DatabaseConnection();
@@ -140,9 +143,52 @@ namespace IrcBot
         //}
         static void Main(string[] args)
         {
+            var argIndex = 0;
+            if(args == null)
+            {
+                args = new[] { "-d", "#beyondthesummit,#D2L" };
+                Console.WriteLine("No channel specified");
+                //Console.WriteLine("closing  application...");
+                //Environment.Exit(0);
+            }
+
+            var config = new StartConfig();
+            if (args[argIndex].StartsWith("-"))
+            {
+                Array.ForEach(args[argIndex].ToString(CultureInfo.InvariantCulture).ToCharArray(),x => ExecCommand(config, x));
+                argIndex++;
+            }
+
+            config.ChannesList = args[argIndex].Split(new char[]{',','#'},StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            foreach (var channelName in config.ChannesList)
+            {
+                foreach (var symbol in channelName.ToCharArray())
+                {
+                    if (!Char.IsLetterOrDigit(symbol))
+                    {
+                        Console.WriteLine("Invalid channelname (" + channelName +")");
+                        Console.WriteLine("closing  application...");
+                        Environment.Exit(0);
+                    }
+                }
+            }
+
             var program = new Program();
-            program.Init("beyondthesummit");
-            program.Run();
+            program.Init(config);
+            //program.Run();
+            Console.WriteLine(args.Length);
+        }
+
+        static void ExecCommand(StartConfig config, char command)
+        {
+            switch (command)
+            {
+                case 'd':
+                    config.Delete = true;
+                    break;
+            }
+
         }
     }
 

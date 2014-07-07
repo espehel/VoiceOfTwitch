@@ -15,3 +15,7 @@ C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\bin\Debug\EntityFra
 C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\obj\Debug\IrcBot.csprojResolveAssemblyReference.cache
 C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\obj\Debug\IrcBot.exe
 C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\obj\Debug\IrcBot.pdb
+C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\bin\Debug\IrcBot.exe.manifest
+C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\bin\Debug\IrcBot.application
+C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\obj\Debug\IrcBot.exe.manifest
+C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\obj\Debug\IrcBot.application

@@ -157,7 +157,7 @@ namespace IrcBot
             {
                 myConnection.Open();
                 SqlCeCommand myCommand = new SqlCeCommand(insertSql, myConnection);
-                myCommand.Parameters.AddWithValue("@text", channel.Name);
+                myCommand.Parameters.AddWithValue("@name", channel.Name);
                 myCommand.Parameters.AddWithValue("@startedAt", channel.StartedAt);
                 myCommand.Parameters.AddWithValue("@createdAt", channel.CreatedAt);
                 myCommand.ExecuteNonQuery();
