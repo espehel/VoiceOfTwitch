@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using IrcBot.Models;
+using Shared.Models;
 
 namespace IrcBot
 {
@@ -22,6 +23,32 @@ namespace IrcBot
         public string connection_string
         {
             set { strCon = value; }
+        }
+
+        public long insertStatement(StatementModel statement)
+        {
+            string insertSql = @"INSERT INTO Statement(text,createdAt,lastUpdated,score,occurrences,channelId) VALUES(@text, @createdAt, @lastUpdated, @score, @occurrences, @channelId)";
+            //            string identity = @"SELECT id FROM Statement WHERE id = @@IDENTITY";
+            string identitySql = @"SELECT @@IDENTITY AS ID";
+            Object o;
+
+            using (SqlCeConnection myConnection = new SqlCeConnection(strCon))
+            {
+                myConnection.Open();
+                SqlCeCommand myCommand = new SqlCeCommand(insertSql, myConnection);
+                myCommand.Parameters.AddWithValue("@text", statement.Text);
+                myCommand.Parameters.AddWithValue("@createdAt", DateTime.Now);
+                myCommand.Parameters.AddWithValue("@lastUpdated", DateTime.Now);
+                myCommand.Parameters.AddWithValue("@score", statement.Score);
+                myCommand.Parameters.AddWithValue("@occurrences", statement.Occurrences);
+                myCommand.Parameters.AddWithValue("@channelId", statement.ChannelId);
+                myCommand.ExecuteNonQuery();
+
+                myCommand = new SqlCeCommand(identitySql, myConnection);
+                o = myCommand.ExecuteScalar();
+                myConnection.Close();
+            }
+            return Convert.ToInt64(o);
         }
 
         public long insertStatement(Statement statement)
@@ -97,6 +124,7 @@ namespace IrcBot
             }
             Console.WriteLine("DBCON: updates statements [" + counter+"]");
         }
+
         public int ClearStatements()
         {
             string sql = "DELETE Statement";
@@ -108,6 +136,7 @@ namespace IrcBot
             Console.WriteLine("DBCON: deleted " + rowsDeleted + " statements");
             return rowsDeleted;
         }
+
         public int ClearStatements(int threshold)
         {
             string sql = "DELETE Statement WHERE (score < @Threshold)";
@@ -120,6 +149,7 @@ namespace IrcBot
             Console.WriteLine("DBCON: deleted " + rowsDeleted +" statements");
             return rowsDeleted;
         }
+
         public List<Channel> FetchAllChannels()
         {
             List<Channel> channels = new List<Channel>();
@@ -139,6 +169,7 @@ namespace IrcBot
             Console.WriteLine("DBCON: fetched " + channels.Count + " channels");
             return channels;
         }
+
         public long InsertChannel(Channel channel)
         {
             List<Channel> channels = FetchAllChannels();

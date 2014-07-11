@@ -8,102 +8,99 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using DataAccess.Adapters;
 using IrcBot.Models;
+using Shared.Models;
 
 namespace IrcBot
 {
-    class Program : IMessageListener
+    internal class Program : IMessageListener
     {
-        private List<Statement> statements;
+        //private List<Statement> statements;
+        private List<StatementModel> _statements;
         private Bot bot;
         private DatabaseConnection dbCon;
         private DataSet ds;
         private string conString;
         private Timer timer;
         private int counter = 0;
-        private Channel channel;
+        private ChannelModel channel;
+        private VoiceAdapter adapter;
 
         public void Init(StartConfig config)
         {
-
             string channelName = config.ChannesList[0];
             //bot = new Bot("irc.freenode.net", 6667, "#espensChannel");
-            bot = new Bot("irc.twitch.tv", 6667, "#"+channelName);
+            bot = new Bot("irc.twitch.tv", 6667, "#" + channelName);
             dbCon = new DatabaseConnection();
             conString = Properties.Settings.Default.StatementsDatabaseConnectionString;
-//            conString = @"Data Source=E:\Git\VoiceOfTwitch\IrcBot\StatementsDatabase.sdf";
-            //conString = @"Data Source=C:\Users\Espen\Documents\StatementsDatabase.sdf";
             dbCon.connection_string = conString;
-            Console.WriteLine("PROGRAM: Deleted " + dbCon.ClearStatements() + " rows.");
-            channel = new Channel(channelName,DateTime.Now,DateTime.Now);
-            var id = dbCon.InsertChannel(channel);
-            if (id == -1)
-                dbCon.UpdateChannel(channel);
-            else
-                channel.Id = id;
-            statements = dbCon.FetchAllStatements();
-            timer = new Timer(TimerCallback,null,30000,30000);
+            adapter = new VoiceAdapter();
+            if (config.Delete)
+            {
+                //Console.WriteLine("PROGRAM: Deleted " + dbCon.ClearStatements() + " rows.");
+                adapter.DeleteAllStatements();
+                Console.WriteLine("PROGRAM: Deleted all rows.");
+            }
+            //channel = new Channel(channelName,DateTime.Now,DateTime.Now);
+            channel = new ChannelModel()
+                {
+                    Name = channelName,
+                    Live = true
+                };
+            adapter.AddOrUpdateChannel(channel);
+            //var id = dbCon.InsertChannel(channel);
+            //if (id == -1)
+            //    dbCon.UpdateChannel(channel);
+            //else
+            //    channel.Id = id;
+            _statements = adapter.GetStatements();
+            //statements = dbCon.FetchAllStatements();
+            timer = new Timer(TimerCallback, null, 30000, 30000);
 //            ds = dbCon.GetConnection;
-
         }
 
         public void Run()
         {
-            
             bot.AddListener(this);
             bot.Start();
 
             while (true)
             {
                 ConsoleKeyInfo c = Console.ReadKey(true);
-//                Console.WriteLine("Program");
-//                foreach (var statement in statements)
-//                {
-//                    ds.Tables[0].Rows.Add(setAsRow(statement));
-//                }
-//                try{
-//                    dbCon.UpdateDatabase(ds);
-//                }
-//                    catch (Exception err)
-//                {
-//                    Console.WriteLine(err.Message);
-//                }
                 switch (c.Key)
                 {
-                    case ConsoleKey.Q: 
+                    case ConsoleKey.Q:
                         bot.Stop();
-                        
+
                         Console.WriteLine("PROGRAM: q");
                         timer.Dispose();
-                        dbCon.UpdateStatements(statements,counter);
+                        //dbCon.UpdateStatements(statements, counter);
+                        adapter.UpdateStatements(_statements,counter);
                         break;
                     case ConsoleKey.P:
                         PrintStatements();
                         Console.WriteLine("PROGRAM: p");
                         break;
                 }
-
-
-//                if (c.Key == ConsoleKey.Q)
-//                {
-//                    bot.Stop();
-//                    return;
-//                }
-
             }
         }
+
         private void TimerCallback(object state)
         {
-            dbCon.UpdateStatements(statements,counter);
-            dbCon.ClearStatements(2);
-            statements = dbCon.FetchAllStatements();
+            //dbCon.UpdateStatements(statements, counter);
+            adapter.UpdateStatements(_statements, counter);
+            //dbCon.ClearStatements(2);
+            //adapter.DeleteRareStatements(2);
+            //statements = dbCon.FetchAllStatements();
+            _statements = adapter.GetStatements();
         }
 
         private void PrintStatements()
         {
-            foreach (var statement in statements)
+            foreach (var statement in _statements)
             {
-                Console.WriteLine("PROGRAM: " + statement);
+                Console.WriteLine("PROGRAM: " + statement.Text + "["+statement.Score+"]");
             }
         }
 
@@ -111,14 +108,20 @@ namespace IrcBot
         {
             bool exists = false;
 
-            Statement newStatement = new Statement(message);
-            Parallel.For(0, statements.Count, (i) =>
+            StatementWrapper newStatement = new StatementWrapper(new StatementModel()
             {
-                Statement oldStatement = statements[i];
+            Text = message,
+            Score = 1,
+            Occurrences = 1
+            });
+            //Parallel.For(0, statements.Count, (i) =>
+            Parallel.For(0, _statements.Count, (i) =>
+            {
+                var oldStatement = new StatementWrapper(_statements[i]);
                 if (oldStatement.Equals(message))
                 {
                     oldStatement.IncrementScore(1);
-                    oldStatement.Occurrences++;
+                    oldStatement.Statement.Occurrences++;
                     exists = true;
                 }
                 else
@@ -126,27 +129,20 @@ namespace IrcBot
             });
             if (!exists)
             {
-                newStatement.ChannelId = channel.Id;
-                newStatement.Id = dbCon.insertStatement(newStatement);
-                statements.Add(newStatement);
+                newStatement.Statement.ChannelId = channel.Id;
+                //newStatement.Statement.Id = dbCon.insertStatement(newStatement);
+                newStatement.Statement.Id = dbCon.insertStatement(newStatement.Statement);
+                _statements.Add(newStatement.Statement);
             }
             counter++;
         }
 
-        //private DataRow setAsRow(Statement statement)
-        //{
-        //    DataRow row = ds.Tables[0].NewRow();
-        //    row[1] = statement.Text;
-        //    row[2] = statement.CreatedAt;
-        //    row[3] = statement.LastUpdated;
-        //    return row;
-        //}
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var argIndex = 0;
-            if(args == null)
+            if (args == null || args.Length == 0)
             {
-                args = new[] { "-d", "#beyondthesummit,#D2L" };
+                args = new[] {"dota2ti_1,#beyondthesummit,#D2L"};
                 Console.WriteLine("No channel specified");
                 //Console.WriteLine("closing  application...");
                 //Environment.Exit(0);
@@ -155,19 +151,21 @@ namespace IrcBot
             var config = new StartConfig();
             if (args[argIndex].StartsWith("-"))
             {
-                Array.ForEach(args[argIndex].ToString(CultureInfo.InvariantCulture).ToCharArray(),x => ExecCommand(config, x));
+                Array.ForEach(args[argIndex].ToString(CultureInfo.InvariantCulture).ToCharArray(),
+                    x => ExecCommand(config, x));
                 argIndex++;
             }
 
-            config.ChannesList = args[argIndex].Split(new char[]{',','#'},StringSplitOptions.RemoveEmptyEntries).ToList();
+            config.ChannesList =
+                args[argIndex].Split(new char[] {',', '#'}, StringSplitOptions.RemoveEmptyEntries).ToList();
 
             foreach (var channelName in config.ChannesList)
             {
                 foreach (var symbol in channelName.ToCharArray())
                 {
-                    if (!Char.IsLetterOrDigit(symbol))
+                    if (!(Char.IsLetterOrDigit(symbol) || symbol == '_'))
                     {
-                        Console.WriteLine("Invalid channelname (" + channelName +")");
+                        Console.WriteLine("Invalid channelname (" + channelName + ")");
                         Console.WriteLine("closing  application...");
                         Environment.Exit(0);
                     }
@@ -176,11 +174,10 @@ namespace IrcBot
 
             var program = new Program();
             program.Init(config);
-            //program.Run();
-            Console.WriteLine(args.Length);
+            program.Run();
         }
 
-        static void ExecCommand(StartConfig config, char command)
+        private static void ExecCommand(StartConfig config, char command)
         {
             switch (command)
             {
@@ -188,9 +185,6 @@ namespace IrcBot
                     config.Delete = true;
                     break;
             }
-
         }
     }
-
-
 }

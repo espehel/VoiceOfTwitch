@@ -5,6 +5,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IrcBot", "IrcBot\IrcBot.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoiceOfTwitch", "VoiceOfTwitch\VoiceOfTwitch.csproj", "{1AED6EE9-C681-4643-B91B-0F51BACF3D76}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{BA5B47BA-9A42-461F-83D3-1F29DE877907}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{5E5CB376-33F9-40FC-87ED-E5971EC588D7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +23,14 @@ Global
 		{1AED6EE9-C681-4643-B91B-0F51BACF3D76}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1AED6EE9-C681-4643-B91B-0F51BACF3D76}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1AED6EE9-C681-4643-B91B-0F51BACF3D76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA5B47BA-9A42-461F-83D3-1F29DE877907}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA5B47BA-9A42-461F-83D3-1F29DE877907}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA5B47BA-9A42-461F-83D3-1F29DE877907}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA5B47BA-9A42-461F-83D3-1F29DE877907}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E5CB376-33F9-40FC-87ED-E5971EC588D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E5CB376-33F9-40FC-87ED-E5971EC588D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E5CB376-33F9-40FC-87ED-E5971EC588D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E5CB376-33F9-40FC-87ED-E5971EC588D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
