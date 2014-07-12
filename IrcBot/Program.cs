@@ -20,7 +20,6 @@ namespace IrcBot
         private List<StatementModel> _statements;
         private Bot bot;
         private DatabaseConnection dbCon;
-        private DataSet ds;
         private string conString;
         private Timer timer;
         private int counter = 0;
@@ -31,7 +30,11 @@ namespace IrcBot
         {
             string channelName = config.ChannesList[0];
             //bot = new Bot("irc.freenode.net", 6667, "#espensChannel");
-            bot = new Bot("irc.twitch.tv", 6667, "#" + channelName);
+            if(!config.IsEvent)
+                bot = new Bot("irc.twitch.tv", 6667, "#" + channelName);
+            else
+                bot = new Bot("199.9.250.117", 80, "#" + channelName);
+            
             dbCon = new DatabaseConnection();
             conString = Properties.Settings.Default.StatementsDatabaseConnectionString;
             dbCon.connection_string = conString;
@@ -44,10 +47,10 @@ namespace IrcBot
             }
             //channel = new Channel(channelName,DateTime.Now,DateTime.Now);
             channel = new ChannelModel()
-                {
-                    Name = channelName,
-                    Live = true
-                };
+            {
+                Name = channelName,
+                Live = true
+            };
             adapter.AddOrUpdateChannel(channel);
             //var id = dbCon.InsertChannel(channel);
             //if (id == -1)
@@ -76,7 +79,7 @@ namespace IrcBot
                         Console.WriteLine("PROGRAM: q");
                         timer.Dispose();
                         //dbCon.UpdateStatements(statements, counter);
-                        adapter.UpdateStatements(_statements,counter);
+                        adapter.UpdateStatements(_statements, counter);
                         break;
                     case ConsoleKey.P:
                         PrintStatements();
@@ -100,7 +103,7 @@ namespace IrcBot
         {
             foreach (var statement in _statements)
             {
-                Console.WriteLine("PROGRAM: " + statement.Text + "["+statement.Score+"]");
+                Console.WriteLine("PROGRAM: " + statement.Text + "[" + statement.Score + "]");
             }
         }
 
@@ -108,11 +111,11 @@ namespace IrcBot
         {
             bool exists = false;
 
-            StatementWrapper newStatement = new StatementWrapper(new StatementModel()
+            var newStatement = new StatementWrapper(new StatementModel()
             {
-            Text = message,
-            Score = 1,
-            Occurrences = 1
+                Text = message,
+                Score = 1,
+                Occurrences = 1
             });
             //Parallel.For(0, statements.Count, (i) =>
             Parallel.For(0, _statements.Count, (i) =>
@@ -142,7 +145,7 @@ namespace IrcBot
             var argIndex = 0;
             if (args == null || args.Length == 0)
             {
-                args = new[] {"dota2ti_1,#beyondthesummit,#D2L"};
+                args = new[] {"-d","dota2ti,#beyondthesummit,#D2L"};
                 Console.WriteLine("No channel specified");
                 //Console.WriteLine("closing  application...");
                 //Environment.Exit(0);
@@ -172,6 +175,8 @@ namespace IrcBot
                 }
             }
 
+            config.IsEvent = checkIfEventChannel(config.ChannesList[1]);
+
             var program = new Program();
             program.Init(config);
             program.Run();
@@ -185,6 +190,12 @@ namespace IrcBot
                     config.Delete = true;
                     break;
             }
+        }
+
+        private static bool checkIfEventChannel(string channelName)
+        {
+            var eventChannels = new string[] { "dota2ti", "dota2ti_1", "dota2ti_2", "dota2ti_3", "dota2ti_4" };
+            return eventChannels.Contains(channelName);
         }
     }
 }

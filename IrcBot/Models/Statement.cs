@@ -42,7 +42,7 @@ namespace IrcBot.Models
         private void GenerateTerms()
         {
             //TODO: use the text to make terms for finding similar texts
-            Terms = IndexingUtils.extractTerms(Text);
+            Terms = IndexingUtils.ExtractTerms(Text);
         }
 
         public void IncrementScore(double i)

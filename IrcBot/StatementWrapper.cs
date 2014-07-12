@@ -17,12 +17,13 @@ namespace IrcBot
         public StatementWrapper(StatementModel model)
         {
             Statement = model;
+            GenerateTerms();
         }
 
         private void GenerateTerms()
         {
             //TODO: use the text to make terms for finding similar texts
-            Terms = IndexingUtils.extractTerms(Statement.Text);
+            Terms = IndexingUtils.ExtractTerms(Statement.Text);
         }
 
         public void IncrementScore(double i)

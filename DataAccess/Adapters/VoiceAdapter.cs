@@ -34,7 +34,7 @@ namespace DataAccess.Adapters
         {
             using (var ef = new VoiceDatabaseEntities())
             {
-                ef.Database.ExecuteSqlCommand("TRUNCATE TABLE Statement");
+                ef.Database.ExecuteSqlCommand("DELETE Statement");
                 ef.SaveChanges();
             }
         }

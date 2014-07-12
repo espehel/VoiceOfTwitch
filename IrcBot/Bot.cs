@@ -30,7 +30,6 @@ namespace IrcBot
     private StreamReader reader;
     private StreamWriter writer;
     private Thread ircThread;
-    private Thread ThreadMessageEventThread;
     private List<IMessageListener> listeners;
     private Pinger pinger;
   
@@ -192,56 +191,5 @@ namespace IrcBot
             if (!String.IsNullOrEmpty(trailing))
                 parameters = parameters.Concat(new string[] { trailing }).ToArray();
         }
-        /*
-        public int Port { get; set; }
-        public TcpListener listener;
-        private Thread listenerThread;
-        public Server(int port)
-        {
-            this.Port = port;
-        }
-
-        public void start()
-        {
-            listener = new TcpListener(new IPEndPoint(IPAddress.Any, Port));
-            listener.Start();
-            listenerThread = new Thread(new ThreadStart(Listener));
-            listenerThread.Start();
-        }
-        public void Stop()
-        {
-            listenerThread.Abort();
-        }
-        private void Listener()
-        {
-            while (true)
-            {
-                try
-                {
-                    TcpClient c = listener.AcceptTcpClient();
-                   // new Thread(new ThreadStart(()=>HandleClient(c))).Start();
-                }
-                catch(Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
-        }
-        private void HandleClient(TcpClient client)
-        {
-            byte[] packetIDData = new byte[2];
-            client.GetStream().Read(packetIDData, 0, 2);
-            switch(packetID)
-            {
-                case 0:
-                    byte[] data = new byte[4];
-                    client.GetStream().Read(data, 0, 4);
-                    int lengt = BitConverter.ToInt32(data,0);
-                    data=new byte[length];
-                    client.GetStream().Read(data, 0 ,length);
-
-            }
-        }
-        */
     }
 }

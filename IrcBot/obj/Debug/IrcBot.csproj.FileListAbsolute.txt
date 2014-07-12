@@ -19,3 +19,7 @@ C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\bin\Debug\IrcBot.ex
 C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\bin\Debug\IrcBot.application
 C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\obj\Debug\IrcBot.exe.manifest
 C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\obj\Debug\IrcBot.application
+C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\bin\Debug\DataAccess.dll
+C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\bin\Debug\Shared.dll
+C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\bin\Debug\DataAccess.pdb
+C:\Users\Espen\Development\Repositories\VoiceOfTwitch\IrcBot\bin\Debug\Shared.pdb

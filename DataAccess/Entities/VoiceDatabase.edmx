@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="StatementsDatabaseModel.Store" Alias="Self" Provider="System.Data.SqlServerCe.4.0" ProviderManifestToken="4.0" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="StatementsDatabaseModel.Store" Alias="Self" Provider="System.Data.SqlServerCe.4.0" ProviderManifestToken="4.0" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityContainer Name="StatementsDatabaseModelStoreContainer">
           <EntitySet Name="Channel" EntityType="StatementsDatabaseModel.Store.Channel" store:Type="Tables" />
           <EntitySet Name="Statement" EntityType="StatementsDatabaseModel.Store.Statement" store:Type="Tables" />
@@ -30,8 +30,7 @@
           <Property Name="occurrences" Type="bigint" />
           <Property Name="channelId" Type="bigint" Nullable="false" />
         </EntityType>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="StatementsDatabaseModel" Alias="Self" p1:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:p1="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
