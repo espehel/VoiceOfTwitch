@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ namespace DataAccess.Adapters
             var statements = new List<StatementModel>();
             using (var ef = new VoiceDatabaseEntities())
             {
-               statements = ef.Statements.Select(x => new StatementModel()
+                statements = ef.Statements.Select(x => new StatementModel()
                 {
                     Id = x.id,
                     ChannelId = x.channelId,
@@ -64,13 +65,61 @@ namespace DataAccess.Adapters
             }
         }
 
-        public void UpdateStatements(List<StatementModel> statementModels, int counter )
+        public void UpdateStatements(List<StatementModel> statementModels, int counter)
         {
             using (var ef = new VoiceDatabaseEntities())
             {
-                statementModels.ForEach(sm => UpdateStatement(ef.Statements.FirstOrDefault(s => s.id == sm.Id),sm));
-                ef.SaveChanges();
+                ef.Database.Connection.Open();
+                using (var tx = ef.Database.Connection.BeginTransaction(IsolationLevel.Serializable))
+                {
+                    try
+                    {
+                        //ef.Database.Connection.BeginTransaction();
+                        statementModels.ForEach(
+                            sm => UpdateStatement(ef.Statements.FirstOrDefault(s => s.id == sm.Id), sm));
+                        ef.SaveChanges();
+                        tx.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        //tx.Rollback();
+                        throw;
+                    }
+                }
             }
+        }
+
+        public long InsertStatement(StatementModel statement)
+        {
+            Statement st;
+            using (var ef = new VoiceDatabaseEntities())
+            {
+                ef.Database.Connection.Open();
+                using (var tx = ef.Database.Connection.BeginTransaction(IsolationLevel.Serializable))
+                {
+                    try
+                    {
+                        st = new Statement()
+                        {
+                            channelId = statement.ChannelId,
+                            createdAt = DateTime.Now,
+                            lastUpdated = DateTime.Now,
+                            occurrences = 1,
+                            score = 1,
+                            text = statement.Text
+                        };
+                        ef.Statements.Add(st);
+                        ef.SaveChanges();
+                        tx.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        //tx.Rollback();
+                        throw;
+                    }
+                }
+            }
+            return st.id;
         }
 
         private void UpdateStatement(Statement statement, StatementModel model)
@@ -79,6 +128,7 @@ namespace DataAccess.Adapters
             statement.score = (float?) model.Score;
             statement.lastUpdated = DateTime.Now;
         }
+
         public void DeleteRareStatements(int threshold)
         {
             using (var ef = new VoiceDatabaseEntities())

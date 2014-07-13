@@ -77,7 +77,7 @@ namespace IrcBot
                 {
                     while ((inputLine = reader.ReadLine()) != null)
                     {
-                        Console.WriteLine("BOT: " + inputLine);
+                        //Console.WriteLine("BOT: " + inputLine);
 //                        string[] splitted = inputLine.Split(new char[] { ':' });
 
 //                        for (int i = 0; i < splitted.Length; i++)
@@ -112,6 +112,7 @@ namespace IrcBot
 
         private void FireNewMessageEvent(string message)
         {
+            Console.WriteLine("["+Server+"] " + message);
             foreach (var messageListener in listeners)
             {
                 messageListener.NewMessage(message);

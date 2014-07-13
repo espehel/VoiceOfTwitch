@@ -25,15 +25,19 @@ namespace IrcBot
         private int counter = 0;
         private ChannelModel channel;
         private VoiceAdapter adapter;
+        private ServerInfo[] servers;
+        private int serverIndex = 0;
+        private string channelName;
 
         public void Init(StartConfig config)
         {
-            string channelName = config.ChannesList[0];
+            InitServers();
+            channelName = "#"+config.ChannesList[0];
             //bot = new Bot("irc.freenode.net", 6667, "#espensChannel");
             if(!config.IsEvent)
-                bot = new Bot("irc.twitch.tv", 6667, "#" + channelName);
+                bot = new Bot("irc.twitch.tv", 6667, channelName);
             else
-                bot = new Bot("199.9.250.117", 80, "#" + channelName);
+                bot = new Bot("199.9.250.117", 80, channelName);
             
             dbCon = new DatabaseConnection();
             conString = Properties.Settings.Default.StatementsDatabaseConnectionString;
@@ -48,7 +52,7 @@ namespace IrcBot
             //channel = new Channel(channelName,DateTime.Now,DateTime.Now);
             channel = new ChannelModel()
             {
-                Name = channelName,
+                Name = channelName.Substring(1),
                 Live = true
             };
             adapter.AddOrUpdateChannel(channel);
@@ -61,6 +65,43 @@ namespace IrcBot
             //statements = dbCon.FetchAllStatements();
             timer = new Timer(TimerCallback, null, 30000, 30000);
 //            ds = dbCon.GetConnection;
+        }
+
+        private void InitServers()
+        {
+            servers = new[]
+            {
+                new ServerInfo()
+                {
+                    Adress = "199.9.250.117",
+                    Port = 80
+                },
+                new ServerInfo()
+                {
+                    Adress = "199.9.251.213",
+                    Port = 80
+                },
+                new ServerInfo()
+                {
+                    Adress = "199.9.252.26",
+                    Port = 80
+                },
+                new ServerInfo()
+                {
+                    Adress = "199.9.250.117",
+                    Port = 443
+                },
+                new ServerInfo()
+                {
+                    Adress = "199.9.251.213",
+                    Port = 443
+                },
+                new ServerInfo()
+                {
+                    Adress = "199.9.252.26",
+                    Port = 443
+                }
+            };
         }
 
         public void Run()
@@ -85,7 +126,17 @@ namespace IrcBot
                         PrintStatements();
                         Console.WriteLine("PROGRAM: p");
                         break;
+                    case ConsoleKey.N:
+                        bot.Stop();
+                        Console.Clear();
+                        Console.WriteLine("Switching server...");
+                        bot = new Bot(servers[serverIndex % 6].Adress,servers[serverIndex % 6].Port,channelName);
+                        serverIndex++;
+                        bot.AddListener(this);
+                        bot.Start();
+                        break;
                 }
+
             }
         }
 
@@ -134,7 +185,8 @@ namespace IrcBot
             {
                 newStatement.Statement.ChannelId = channel.Id;
                 //newStatement.Statement.Id = dbCon.insertStatement(newStatement);
-                newStatement.Statement.Id = dbCon.insertStatement(newStatement.Statement);
+                //newStatement.Statement.Id = dbCon.insertStatement(newStatement.Statement);
+                newStatement.Statement.Id = adapter.InsertStatement(newStatement.Statement);
                 _statements.Add(newStatement.Statement);
             }
             counter++;
@@ -176,7 +228,7 @@ namespace IrcBot
             }
 
             config.IsEvent = checkIfEventChannel(config.ChannesList[1]);
-
+            config.IsEvent = true;
             var program = new Program();
             program.Init(config);
             program.Run();

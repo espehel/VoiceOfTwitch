@@ -78,6 +78,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ServerInfo.cs" />
     <Compile Include="StartConfig.cs" />
     <Compile Include="DatabaseConnection.cs" />
     <Compile Include="IMessageListener.cs" />

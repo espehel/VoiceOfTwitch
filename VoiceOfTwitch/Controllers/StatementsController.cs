@@ -35,10 +35,10 @@ namespace VoiceOfTwitch.Controllers
 
             ViewBag.Title = "Voice of Twitch";
             ViewBag.Message = "Experience the common voice of Twitch chat live!";
-            var c = _voiceDatabaseEntities.Channels.FirstOrDefault(s => s.id == _channelId);
+            var c = _voiceDatabaseEntities.Channels.FirstOrDefault(cn => cn.name == channel);
             if (c != null)
-                //_channelId = c.id;
-                _channelId = 0;
+                _channelId = c.id;
+                //_channelId = 0;
             else
             {
                 _channelId = 0;
