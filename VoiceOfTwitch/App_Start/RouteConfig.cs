@@ -20,11 +20,17 @@ namespace VoiceOfTwitch
                 defaults: new { controller = "statements", action = "index", ordering = "top" }
                 );*/
 
-            //routes to livedata by default, ordering by top
+            ////routes to livedata by default, ordering by top
+            //routes.MapRoute(
+            //    name: "Statements",
+            //    url: "statements/{action}/{ordering}",
+            //    defaults: new {controller = "statements", action = "livedata", ordering = "top" }
+            //    );
+            //routes to livedata by default, pick default channel
             routes.MapRoute(
                 name: "Statements",
-                url: "statements/{action}/{ordering}",
-                defaults: new {controller = "statements", action = "livedata", ordering = "top" }
+                url: "statements/{action}/{channel}",
+                defaults: new { controller = "statements", action = "livedata", channel = "default" }
                 );
             //default routing
             routes.MapRoute(

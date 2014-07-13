@@ -8,7 +8,7 @@ namespace IrcBot
 {
     class StartConfig
     {
-        public bool IsEvent { get; set; };
+        public bool IsEvent { get; set; }
         public Boolean Delete { get; set; }
         public List<string> ChannesList { get; set; }
     }

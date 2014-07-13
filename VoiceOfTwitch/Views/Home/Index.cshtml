@@ -23,7 +23,7 @@
     <ol class="round">
         <li class="exclamation">
             <h5 class="statement">
-            @Html.ActionLink(@channel.name,"Channel",new {id = channel.id})
+            @Html.ActionLink(@channel.name,"Livedata","Statements",new {channel = channel.name},null)
             </h5>
         </li>
     </ol>

@@ -24,17 +24,27 @@ namespace VoiceOfTwitch.Controllers
         // GET: /Statements/
         // GET: /Statements/Livedata
         // GET: /Statements/Livedata/{ordering}
-        public ActionResult Livedata(string ordering)//default value top
+        public ActionResult Livedata(string channel)//default value top
         {
-            if (TempData["channel"] != null)
+            var caseSwitch = "top";
+            if (TempData["ordering"] != null)
             {
-                _channelId = Convert.ToInt64(TempData["channel"]);
+                caseSwitch = (string)TempData["ordering"];
+                
             }
 
             ViewBag.Title = "Voice of Twitch";
             ViewBag.Message = "Experience the common voice of Twitch chat live!";
+            var c = _voiceDatabaseEntities.Channels.FirstOrDefault(s => s.id == _channelId);
+            if (c != null)
+                //_channelId = c.id;
+                _channelId = 0;
+            else
+            {
+                _channelId = 0;
+            }
             var list = _voiceDatabaseEntities.Statements.Where(statement => statement.channelId == _channelId).ToList();
-            var caseSwitch = ordering.ToLower();
+            caseSwitch = caseSwitch.ToLower();
             switch (caseSwitch)
             {
                 case "top" :
@@ -54,6 +64,12 @@ namespace VoiceOfTwitch.Controllers
         {
             Statement model = _voiceDatabaseEntities.Statements.Find(id);
             return PartialView(model);
+        }
+
+        public ActionResult Ordering(string order)
+        {
+            TempData["ordering"] = order;
+            return RedirectToAction("Livedata", "Statements");
         }
 
     }

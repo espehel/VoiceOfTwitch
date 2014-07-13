@@ -20,10 +20,9 @@ namespace VoiceOfTwitch.Controllers
             return View(list);
         }
 
-        public ActionResult Channel(int id)
+        public ActionResult Channel(string channel)
         {
-            TempData["channel"] = id;
-            return RedirectToAction("Livedata", "Statements");
+            return RedirectToAction("Livedata", "Statements",channel);
         }
         public PartialViewResult Details(int id)
         {
