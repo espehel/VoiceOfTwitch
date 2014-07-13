@@ -46,17 +46,21 @@ namespace DataAccess.Adapters
                 var channel = ef.Channels.SingleOrDefault(c => c.name == channelModel.Name);
 
                 if (channel == null)
-                    ef.Channels.Add(new Channel()
+                {
+                    channel = new Channel()
                     {
                         createdAt = DateTime.Now,
                         name = channelModel.Name,
                         startedAt = DateTime.Now
-                    });
+                    };
+                    ef.Channels.Add(channel);
+                }
                 else
                 {
                     channel.startedAt = DateTime.Now;
                 }
                 ef.SaveChanges();
+                channelModel.Id = channel.id;
             }
         }
 
