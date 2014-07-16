@@ -23,6 +23,13 @@ namespace VoiceOfTwitch.Tools
                 return new OrderByCountImpl();
             }
         }
+        public static IComparer<Statement> OrderByHot
+        {
+            get
+            {
+                return new OrderByHotImpl();
+            }
+        }
         internal class OrderByTopImpl : IComparer<Statement>
         {
             public int Compare(Statement x, Statement y)
@@ -52,6 +59,23 @@ namespace VoiceOfTwitch.Tools
                     return -1;
 
                 return Math.Sign(y.occurrences.Value - x.occurrences.Value);
+
+            }
+        }
+
+        internal class OrderByHotImpl : IComparer<Statement>
+        {
+            public int Compare(Statement x, Statement y)
+            {
+                double xRating = 0;
+                if (x.lastUpdated.HasValue && x.score.HasValue)
+                   xRating = x.score.Value*x.lastUpdated.Value.Subtract(DateTime.Now).Milliseconds;
+                
+                double yRating = 0;
+                if (y.lastUpdated.HasValue && y.score.HasValue)
+                    yRating = y.score.Value * y.lastUpdated.Value.Subtract(DateTime.Now).Milliseconds;
+
+                return Math.Sign(yRating - xRating);
 
             }
         }

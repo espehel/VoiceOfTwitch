@@ -23,14 +23,17 @@ namespace IrcBot
         private string conString;
         private Timer timer;
         private int counter = 0;
+        private int statementsNotInserted = 0;
         private ChannelModel channel;
         private VoiceAdapter adapter;
         private ServerInfo[] servers;
         private int serverIndex = 0;
         private string channelName;
+        private static Mutex _mutex;
 
         public void Init(StartConfig config)
         {
+            _mutex = new Mutex();
             InitServers();
             channelName = "#"+config.ChannesList[0];
             //bot = new Bot("irc.freenode.net", 6667, "#espensChannel");
@@ -64,6 +67,7 @@ namespace IrcBot
             _statements = adapter.GetStatements();
             //statements = dbCon.FetchAllStatements();
             timer = new Timer(TimerCallback, null, 30000, 30000);
+            
 //            ds = dbCon.GetConnection;
         }
 
@@ -120,7 +124,7 @@ namespace IrcBot
                         Console.WriteLine("PROGRAM: q");
                         timer.Dispose();
                         //dbCon.UpdateStatements(statements, counter);
-                        adapter.UpdateStatements(_statements, counter);
+                        adapter.UpdateStatements(_statements);
                         break;
                     case ConsoleKey.P:
                         PrintStatements();
@@ -142,12 +146,30 @@ namespace IrcBot
 
         private void TimerCallback(object state)
         {
-            //dbCon.UpdateStatements(statements, counter);
-            adapter.UpdateStatements(_statements, counter);
-            //dbCon.ClearStatements(2);
-            //adapter.DeleteRareStatements(2);
-            //statements = dbCon.FetchAllStatements();
-            _statements = adapter.GetStatements();
+            Thread.CurrentThread.Priority = ThreadPriority.Highest;
+
+            // Wait until it is safe to enter, and do not enter if the request times out.
+            Console.WriteLine("[localhost] Waiting to update statements...");
+            if (_mutex.WaitOne(2000))
+            {
+                Console.WriteLine("[localhost] Updateing statements...");
+                //critical resource access
+                //dbCon.UpdateStatements(statements, counter);
+                int c = adapter.UpdateStatements(_statements);
+                //dbCon.ClearStatements(2);
+                //adapter.DeleteRareStatements(2);
+                //statements = dbCon.FetchAllStatements();
+                _statements = adapter.GetStatements();
+
+                Console.WriteLine("[localhost] " + c + " statements updated");
+
+                // Release the Mutex.
+                _mutex.ReleaseMutex();
+            }
+            else
+                Console.WriteLine("[localhost] Update failed");
+
+
         }
 
         private void PrintStatements()
@@ -160,7 +182,8 @@ namespace IrcBot
 
         public void NewMessage(string message)
         {
-            bool exists = false;
+            var exists = false;
+            var updated = false;
 
             var newStatement = new StatementWrapper(new StatementModel()
             {
@@ -179,15 +202,29 @@ namespace IrcBot
                     exists = true;
                 }
                 else
-                    oldStatement.SimilarTo(newStatement);
+                    updated = oldStatement.SimilarTo(newStatement);
             });
             if (!exists)
-            {
-                newStatement.Statement.ChannelId = channel.Id;
-                //newStatement.Statement.Id = dbCon.insertStatement(newStatement);
-                //newStatement.Statement.Id = dbCon.insertStatement(newStatement.Statement);
-                newStatement.Statement.Id = adapter.InsertStatement(newStatement.Statement);
-                _statements.Add(newStatement.Statement);
+            {   
+                // Wait until it is safe to enter, and do not enter if the request times out.
+                if (_mutex.WaitOne(100))
+                {
+
+                    //critical resource access
+                    newStatement.Statement.ChannelId = channel.Id;
+                    //newStatement.Statement.Id = dbCon.insertStatement(newStatement);
+                    //newStatement.Statement.Id = dbCon.insertStatement(newStatement.Statement);
+                    newStatement.Statement.Id = adapter.InsertStatement(newStatement.Statement);
+                    _statements.Add(newStatement.Statement);
+
+                    // Release the Mutex.
+                    _mutex.ReleaseMutex();
+                }
+                else
+                {
+                    statementsNotInserted++;
+                    Console.WriteLine("[localhost] " + statementsNotInserted + " statements has not been inserted");
+                }
             }
             counter++;
         }
@@ -197,7 +234,7 @@ namespace IrcBot
             var argIndex = 0;
             if (args == null || args.Length == 0)
             {
-                args = new[] {"-d","dota2ti,#beyondthesummit,#D2L"};
+                args = new[] {"ongamenet,dota2ti,#beyondthesummit,#D2L"};
                 Console.WriteLine("No channel specified");
                 //Console.WriteLine("closing  application...");
                 //Environment.Exit(0);
@@ -227,8 +264,7 @@ namespace IrcBot
                 }
             }
 
-            config.IsEvent = checkIfEventChannel(config.ChannesList[1]);
-            config.IsEvent = true;
+            config.IsEvent = checkIfEventChannel(config.ChannesList[0]);
             var program = new Program();
             program.Init(config);
             program.Run();

@@ -50,17 +50,20 @@ namespace IrcBot
 
         }
 
-        public void SimilarTo(StatementWrapper other)
+        public bool SimilarTo(StatementWrapper other)
         {
             //https://fuzzystring.codeplex.com/
             //algorithms to check for similarities
             double simScore = 0;
             simScore = checkCase(other.Statement.Text);
             simScore = checkHammingDistance(other.Terms);
-
+            
+            if (!(simScore > 0))
+                return false;
 
             IncrementScore(simScore);
             other.IncrementScore(simScore);
+            return true;
         }
         private double calcNewScore(double score)
         {

@@ -10,7 +10,7 @@ namespace VoiceOfTwitch.Controllers
 {
     public class StatementsController : Controller
     {
-        private readonly VoiceDatabaseEntities _voiceDatabaseEntities = new VoiceDatabaseEntities();
+        private readonly VoiceDatabaseEntities ef = new VoiceDatabaseEntities();
         private long _channelId = -1;
 
         //
@@ -24,7 +24,7 @@ namespace VoiceOfTwitch.Controllers
         // GET: /Statements/
         // GET: /Statements/Livedata
         // GET: /Statements/Livedata/{ordering}
-        public ActionResult Livedata(string channel)//default value top
+        public ActionResult Livedata(string channel)
         {
             var caseSwitch = "top";
             if (TempData["ordering"] != null)
@@ -35,7 +35,8 @@ namespace VoiceOfTwitch.Controllers
 
             ViewBag.Title = "Voice of Twitch";
             ViewBag.Message = "Experience the common voice of Twitch chat live!";
-            var c = _voiceDatabaseEntities.Channels.FirstOrDefault(cn => cn.name == channel);
+            ViewBag.Channel = channel;
+            var c = ef.Channels.FirstOrDefault(cn => cn.name == channel);
             if (c != null)
                 _channelId = c.id;
                 //_channelId = 0;
@@ -43,7 +44,7 @@ namespace VoiceOfTwitch.Controllers
             {
                 _channelId = 0;
             }
-            var list = _voiceDatabaseEntities.Statements.Where(statement => statement.channelId == _channelId).ToList();
+            var list = ef.Statements.Where(statement => statement.channelId == _channelId).ToList();
             caseSwitch = caseSwitch.ToLower();
             switch (caseSwitch)
             {
@@ -52,6 +53,9 @@ namespace VoiceOfTwitch.Controllers
                     break;
                 case "count" :
                     list.Sort(StatementComparer.OrderByCount);
+                    break;
+                case "hot" : 
+                    list.Sort(StatementComparer.OrderByHot);
                     break;
                 default:
                     list.Sort(StatementComparer.OrderByTop);
@@ -62,14 +66,14 @@ namespace VoiceOfTwitch.Controllers
         }
         public PartialViewResult Details(int id)
         {
-            Statement model = _voiceDatabaseEntities.Statements.Find(id);
+            Statement model = ef.Statements.Find(id);
             return PartialView(model);
         }
 
-        public ActionResult Ordering(string order)
+        public ActionResult Ordering(string order, string channelN)
         {
             TempData["ordering"] = order;
-            return RedirectToAction("Livedata", "Statements");
+            return RedirectToAction("Livedata", "Statements",new {channel = channelN});
         }
 
     }
