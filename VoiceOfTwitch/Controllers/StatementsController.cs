@@ -12,6 +12,7 @@ namespace VoiceOfTwitch.Controllers
     {
         private readonly VoiceDatabaseEntities ef = new VoiceDatabaseEntities();
         private long _channelId = -1;
+        private List<Statement> _statements;
 
         //
         // GET: /Statements/Index
@@ -44,29 +45,29 @@ namespace VoiceOfTwitch.Controllers
             {
                 _channelId = 0;
             }
-            var list = ef.Statements.Where(statement => statement.channelId == _channelId).ToList();
+            _statements = ef.Statements.Where(statement => statement.channelId == _channelId).ToList();
             caseSwitch = caseSwitch.ToLower();
             switch (caseSwitch)
             {
                 case "top" :
-                    list.Sort(StatementComparer.OrderByTop);
+                    _statements.Sort(StatementComparer.OrderByTop);
                     break;
                 case "count" :
-                    list.Sort(StatementComparer.OrderByCount);
+                    _statements.Sort(StatementComparer.OrderByCount);
                     break;
                 case "hot" : 
-                    list.Sort(StatementComparer.OrderByHot);
+                    _statements.Sort(StatementComparer.OrderByHot);
                     break;
                 default:
-                    list.Sort(StatementComparer.OrderByTop);
+                    _statements.Sort(StatementComparer.OrderByTop);
                     break;
             }
             
-            return View(list);
+            return View(_statements);
         }
         public PartialViewResult Details(int id)
         {
-            Statement model = ef.Statements.Find(id);
+            Statement model = _statements.Find(s => s.id == id);
             return PartialView(model);
         }
 

@@ -66,7 +66,7 @@ namespace IrcBot
             //    channel.Id = id;
             _statements = adapter.GetStatements();
             //statements = dbCon.FetchAllStatements();
-            timer = new Timer(TimerCallback, null, 30000, 30000);
+            timer = new Timer(TimerCallback, null, 10000, 10000);
             
 //            ds = dbCon.GetConnection;
         }
@@ -157,7 +157,7 @@ namespace IrcBot
                 //dbCon.UpdateStatements(statements, counter);
                 int c = adapter.UpdateStatements(_statements);
                 //dbCon.ClearStatements(2);
-                //adapter.DeleteRareStatements(2);
+                adapter.DeleteRareStatements(1.3);
                 //statements = dbCon.FetchAllStatements();
                 _statements = adapter.GetStatements();
 
@@ -167,8 +167,11 @@ namespace IrcBot
                 _mutex.ReleaseMutex();
             }
             else
-                Console.WriteLine("[localhost] Update failed");
-
+            {
+                Console.WriteLine("[localhost] UPDATE FAILED");
+                Console.WriteLine("[localhost] UPDATE FAILED");
+                Console.WriteLine("[localhost] UPDATE FAILED");
+            }
 
         }
 
@@ -191,6 +194,9 @@ namespace IrcBot
                 Score = 1,
                 Occurrences = 1
             });
+            // Wait until it is safe to enter, and do not enter if the request times out.
+            if (_mutex.WaitOne(1000))
+            {
             //Parallel.For(0, statements.Count, (i) =>
             Parallel.For(0, _statements.Count, (i) =>
             {
@@ -206,9 +212,7 @@ namespace IrcBot
             });
             if (!exists)
             {   
-                // Wait until it is safe to enter, and do not enter if the request times out.
-                if (_mutex.WaitOne(100))
-                {
+                
 
                     //critical resource access
                     newStatement.Statement.ChannelId = channel.Id;
@@ -234,7 +238,7 @@ namespace IrcBot
             var argIndex = 0;
             if (args == null || args.Length == 0)
             {
-                args = new[] {"ongamenet,dota2ti,#beyondthesummit,#D2L"};
+                args = new[] {"-d","dota2ti,#beyondthesummit,#D2L"};
                 Console.WriteLine("No channel specified");
                 //Console.WriteLine("closing  application...");
                 //Environment.Exit(0);

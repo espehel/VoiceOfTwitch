@@ -122,7 +122,7 @@ namespace DataAccess.Adapters
             updateCounter++;
         }
 
-        public void DeleteRareStatements(int threshold)
+        public void DeleteRareStatements(double threshold)
         {
             using (var ef = new VoiceDatabaseEntities())
             {

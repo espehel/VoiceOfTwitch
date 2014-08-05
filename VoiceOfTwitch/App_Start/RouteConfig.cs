@@ -30,7 +30,7 @@ namespace VoiceOfTwitch
             routes.MapRoute(
                 name: "Statements",
                 url: "statements/{action}/{channel}",
-                defaults: new { controller = "statements"}//, action = "livedata", channel = "default" }
+                defaults: new { controller = "statements", action = "livedata", channel = "default" }
                 );
             //default routing
             routes.MapRoute(
